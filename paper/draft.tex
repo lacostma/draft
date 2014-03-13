@@ -4,8 +4,7 @@
 % This is a simple template for a LaTeX document using the "article" class.
 % See "book", "report", "letter" for other types of document.
 
-
-\documentclass{acm_proc_article-sp} % use larger type; default would be 10pt
+\documentclass{sig-alternate}
 %\usepackage[margin={1.5cm,3cm}]{geometry}
 %\setlength{\columnsep}{1cm}
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
@@ -20,11 +19,11 @@
 % \geometry{margin=2in} % for example, change the margins to 2 inches all round
 % \geometry{landscape} % set up the page for landscape
 %   read geometry.pdf for detailed page layout information
-\usepackage[hidelinks]{hyperref}
-\usepackage[autostyle,french=guillemets,babel]{csquotes}
+%\usepackage[hidelinks]{hyperref}
+%\usepackage[autostyle,french=guillemets,babel]{csquotes}
 \usepackage{graphicx} % support the \includegraphics command and options
-\usepackage[backend=biber]{biblatex}
-\addbibresource{biblio.bib}
+%\usepackage[backend=biber]{biblatex}
+%\addbibresource{biblio.bib}
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 %%% PACKAGES
 \usepackage{booktabs} % for much better looking tables
@@ -32,7 +31,7 @@
 % for better arrays (eg matrices) in maths
 \usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
-\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+%\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
 % These packages are all incorporated in the memoir class to one degree or another...
 \usepackage{amsfonts}
 
@@ -58,13 +57,8 @@
 
 %%% The "real" document content comes below...
 
-\title{A Sample {\ttlit ACM} SIG Proceedings Paper in LaTeX
-Format\titlenote{(Does NOT produce the permission block, copyright information nor page numbering). For use with ACM\_PROC\_ARTICLE-SP.CLS. Supported by ACM.}}
-\subtitle{[Extended Abstract]
-\titlenote{A full version of this paper is available as
-\textit{Author's Guide to Preparing ACM SIG Proceedings Using
-\LaTeX$2_\epsilon$\ and BibTeX} at
-\texttt{www.acm.org/eaddress.htm}}}
+\title{Towards Bridging the Gap... [TBD]}
+
 \author{
 % You can go ahead and credit any number of authors here,
 % e.g. one 'row of three' or two rows (consisting of one row of three
@@ -77,18 +71,20 @@ Format\titlenote{(Does NOT produce the permission block, copyright information n
 % e-mail address with \email.
 %
 % 1st. author
-\numberofauthors{1}
+\numberofauthors{3}
 \alignauthor
-Ben Trovato\titlenote{Dr.~Trovato insisted his name be first.}\\
-       \affaddr{Institute for Clarity in Documentation}\\
-       \affaddr{1932 Wallamaloo Lane}\\
-       \affaddr{Wallamaloo, New Zealand}\\
-       \email{trovato@corporation.com}
-% 2nd. author
-%\date{} % Activate to display a given date or no date (if empty),
-         % otherwise the current date is printed 
+Alex Palesandro\\
+\affaddr{Orange Labs, France}\\
+\texttt{palexster@gmail.com}
+\alignauthor
+Aurélien Wailly\\
+\affaddr{Orange Labs, France}\\
+\texttt{aurelien.wailly@orange.com}
+\alignauthor
+Marc Lacoste\\
+\affaddr{Orange Labs, France}
+\texttt{marc.lacoste@orange.com}
 }
-
 %\setlist[itemize]{leftmargin=*}
 \begin{document}
 \maketitle
@@ -100,7 +96,6 @@ Ben Trovato\titlenote{Dr.~Trovato insisted his name be first.}\\
 %Nested virtualization is a technique capable to diversify hypervisor features. Exploiting an extra layer of virtualization, we will be able to decouple different requirements, avoiding the need to find delicate trade-off.
 %
 %In this paper, we will analyze the state of nested virtualization in modern hypervisor and evaulating the impact of utilization of microhypervisor to enforce a stronger security level.
-
 }
 
 \section{Introduction}
@@ -301,11 +296,11 @@ In the previous sections we proposed a functional analysis of cloud architecture
 
 
 \begin{figure}
-\caption{Xen over NOVA architecture}
-\label{fig:io}
 \begin{center}
 \includegraphics[width=0.6\columnwidth]{article.png}
 \end{center}
+\caption{Xen over NOVA architecture}
+\label{fig:io}
 \end{figure}
 
 \begin{itemize}[]
@@ -356,5 +351,8 @@ In the previous sections we proposed a functional analysis of cloud architecture
 
 
 %\section{Conclusion}
-\printbibliography
+%{\scriptsize
+%\bibliographystyle{abbrv}
+%\bibliography{biblio}
+%}
 \end{document}
