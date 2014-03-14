@@ -22,8 +22,8 @@
 %\usepackage[hidelinks]{hyperref}
 %\usepackage[autostyle,french=guillemets,babel]{csquotes}
 \usepackage{graphicx} % support the \includegraphics command and options
-%\usepackage[backend=biber]{biblatex}
-%\addbibresource{biblio.bib}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{biblio.bib}
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 %%% PACKAGES
 \usepackage{booktabs} % for much better looking tables
@@ -57,7 +57,7 @@
 
 %%% The "real" document content comes below...
 
-\title{Towards Bridging the Gap... [TBD]}
+\title{}
 
 \author{
 % You can go ahead and credit any number of authors here,
@@ -114,7 +114,7 @@ To resume, in order to present a complete view of the architecture, we identifie
 \item \textbf{DP1 User-Data privacy} A curious or malicious administrator ( or another platform user) would not have the right to inspect and analyze user data and instances, without the explicit consensus with the user above mutually trusted services. User-data privacy is a major challenge of modern cloud platforms. It is important to identify a trade-off that allows providers to identify and intervene on possible menaces, but also guarantee the impossibility for a curious or malicious operator to access to them without restrictions. In order to respect this principle when a platform administrator manages the platform it has not the highest level of privilege and each action on users object that he wants to deliver has to be validated by a mutually-trusted core, executed at the highest level of privilege. Moreover, this mutually-trust core has also to apply memory page cipher/uncipher in order to prevent memory page snooping when a page is swapped out.
 \item \textbf{DP2 Fail-Safe modular architecture} In order to recover soft failures, the archtecure is supposed to be fail-safe, being able of automatically migrate instances or user-data in presence of a menace, but also reactivating the correct functioning in presence of a software failure. In order to satisfy this property, the amount of safety-critical components has to be as lowest as possible and the overall design has to be kept as modular as possible
 \item \textbf{DP3 Small TCB} The amount of lines of code executed at the highest level of privilege is normally proportional to the number of potential failures and bugs in the platform. According to this, an architecture presenting a tiny TCB will improve its safety and integrity properties by design.
-\item \textbf{DP4 Inter-platform support} The cloud architecture has to be designed in order to support directly different platforms and service providers. The same user virtual instances have to be executed ( and potentially migrated) unmodified over different platforms.
+\item \textbf{DP4 Inter-platform support} The cloud architecture has to be designed in order to support directly different platforms and service providers. The same user virtual instances have to be executed (and potentially migrated) unmodified over different platforms.
 \item \textbf{DP5 3rd part compatibility} Avoid disruption of existing 3rd part applications compatibility could represent a major principle to consider. Platform interfaces has to be kept as close as possible to the existing one, preventing application rewrite.
 \end{itemize}
 Moreover, beside this functional design principles specifying which features have to be achieved by the platform, another set of non-design principles could be identified. Those principles does not concern directly features or aspects of the architecture of the platform, but the effective feasibility of the architecture. 
@@ -149,11 +149,13 @@ Each layer will have to care about a subset of features, simplifying overall dev
 However, nested virtualization on x86 architecture faced impeding performance issues \cite{rec:virt}.
 
 % Perfomance issuess adressed
-However, several works demonstrate that it is possible to put in place low overhead nested virtualization using special approaches \cite{turtle:ibm} . Moreover, other works try to recover performance loss exploiting multi-level consolidation, introduced in nested virtualization \cite{art:blan}. In conclusion, nested virtualization slowdown could be considered at now an acceptable price to achieve advanced features and, in addition, hardware manifacturers are developing and proposing new hardware facilities to reduce this overhead \cite{vmcs:nakajima}.
+However, several works demonstrate that it is possible to put in place low overhead nested virtualization using special approaches \cite{turtle:ibm} . Moreover, other works try to recover performance loss exploiting multi-level consolidation, introduced in nested virtualization \cite{art:blan}. In conclusion, nested virtualization slowdown could be considered nowadays an acceptable price to achieve advanced features and, in addition, hardware manifacturers are developing and proposing new hardware facilities to reduce this overhead \cite{vmcs:nakajima}.
 
 To sum up, no architecture had been presented to address vertical and horizontal class of problems at the same time until now. XenBlanket does not investigate cloud architectural security concerns (DP3,DP2), limiting the focus on new potential feature of a coordinated multi-provider cloud. Cloudvisor proposed a security architecture that leverages nested virtualization without allowing the possibility of executing more than one nested hypervisor at time, that is a crucial requirements of a multi-provider cloud platform (DP4). In a SuperCloud scenario, each user has to run its own L1 hypervisor instance to enforce a compatibility layer, overcoming incompatibilities between different providers.
 
 Other approaches leveraging only one layer of virtualization does not achieve the whole design-principle satisfaction. Self-service cloud approach (SSC) \cite{ssc:art} design a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures, in order to alleviate the different needing user-centric and provider-centric vision of cloud computing presented in \ref{par:intro}. Even if this architecture reproduces an approach similar to the SuperCloud without leveraging an extra layer of virtualization (DP4), the approach changes the behavior where the user acts introducing new components that have to be directly managed by the user. Therefore, the main drawback of this solution is to change the interface with the user, preventing the possibility to straightforwardly move to the new platform without having to change its applications (DP5).
+
+Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented an dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach of  demoting the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
 
 \section{Classic nested virtualization approach}
 
@@ -180,7 +182,7 @@ Secondly, due to the monolithic architecture, each feature introduced in GPH enl
 %A brief comparison of TCB of widespread GPH is depicted in figure \ref{fig:tcbchart}. 
 %More importanly, this is particularly true looking at the monolithic approach of commercial hyper-visors, where any addition to the hypervisor body enlarges the TCB.
 
-Finally, the above architecture does not improve the overall stability of the infrastructure. The underlying core, L0, has the same problem of single-layer GPH architecture: the large TCB implies also that a failure experienced in one of the critical components will simply produce a generalized failure of the whole platform, not satysfing DP2. Moreover, in GPH standard architecture, the administrator has the entire control of the platform and could potentially snoop and inspect user VM status and data.
+Finally, the above architecture does not improve the overall stability of the infrastructure. The underlying core, L0, has the same problem of single-layer GPH architecture: the large TCB implies also that a failure experienced in one of the critical components will simply produce a generalized failure of the whole platform, not satisfying DP2. Moreover, in GPH standard architecture, the administrator has the entire control of the platform and could potentially snoop and inspect user VM status and data.
 
 This kind of architecture, in particular, does not leverage completely the possibility to hide behind a compatible layer, a really modular architecture with only a tiny critical core.
 To sum up, current nested virtualization limits are represented by a certain lack of dedicated feature in modern hypervisor and the impossibility to rely on a tiny TCB (DP3,DP4).
@@ -204,7 +206,9 @@ Microkernels have the capacity of easily redesign the hierarchy of privileges. A
 
 Therefore, leveraging this concept of microkernels, a micro hypervisor (MH) is composed from a small kernel providing only essential functions, like scheduling, IPC, memory management and VMX extension. Several micro-hypervisor have been proposed in literature \cite{xmhf, nova}. They rely on the micro-kernel paradigm, extending it to virtualization. MH naturally satisfy vertical design principles (DP1,DP3, DP4). The tiny core could be considered the only system-critical componente of the architecture and, due to its relative small dimension and the consequent minor attitude to vulnerabilities,it could represent the ``last line of defense''.
 
-In addition, MH inherits the concept of micro-kernel to implement different ``personalities''. Those ``personalities'' are concretely a set of ``processes'' handling specific functions running in user-space. As those functions are implemented outside the kernel, they are not unique but they are changeable and could coexist at the same time. This feature was seen with interest because of the possibility to move some virtualization-related from the kernel space to user-space and to strictly separate piece of software executed for different users. This extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity.  A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
+In addition, MH inherits the concept of micro-kernel to implement different ``personalities''. Those ``personalities'' are concretely a set of ``processes'' handling specific functions running in user-space. As those functions are implemented outside the kernel, each user could rely on a different instances of the hypervisor user-space process, that could coexist at the same time. This process separation between user could enforce a straightforward mechanism to neutralize VM-to-VM attack from a malicious user. Moreover, user-space processes are easier to debug with commodity tools (GDB, valgrind).
+Finally, this extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity.  A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
+In addition, this approach is not far from the one proposed in DeHype \cite{wu2013TamHosHypMosDepExe}, where a consistent part of the KVM hypervisor has been demoted in user-space.
 
 \subsection {MH general issues}
 
@@ -216,6 +220,15 @@ Finally, microkernel modularization introduce a major challenge in architecture 
 
 
 \section{Architecture comparison}
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=2\columnwidth]{globalcut.png}
+\end{center}
+\caption{}
+\label{fig:io}
+\end{figure*}
+
 
 The adoption of an extra layer of virtualization is capable to introduce a remarkable set of new features but it does not reduce the dimension of Trusted Code Base (TCB). 
 MH could represent a new approach to improve the potential benefits provided by the adoption of nested virtualization. In the following subsections, it will presented the four possible architectures achievable ``nesting'' of GPH and MH, underlying potentialities, drawbacks and potential cost of implementation.
@@ -249,6 +262,7 @@ However, the amount of code running in L0 kernel space is still as big as before
 Finally, adopting a MH as L1 prevents to use inter-platform enhanced features. As analyzed when dealing with MH design, the price of having a tiny core is normally paid with a lack of certain functionalities. For example, XMHF only supports one single guest. It could be easily noticed that this approach is not architecturally able to provide any new "horizontal" features, leveraging on nested virtualization. Therefore, the architecture is only able to provide the same features that are provided by today deployed ones, with an enhanced but not sufficient level of isolation.
 
 \subsection{GPH over MH}
+
 \label{par:gom}
 
 \begin{table*}
@@ -294,14 +308,6 @@ To sum up,  the adoption of MH could  increase feature set introduced by nested 
  \section{Implementation}
 In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA.
 
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.6\columnwidth]{article.png}
-\end{center}
-\caption{Xen over NOVA architecture}
-\label{fig:io}
-\end{figure}
 
 \begin{itemize}[]
 \item \textbf{Inter-platform support} Executed as L1, Xen would virtualize its nested guest initially using PV delivering the compatibility layer.
