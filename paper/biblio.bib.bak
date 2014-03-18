@@ -705,7 +705,7 @@
 }
 
 @Article{intel:shadowing,
-  Title                    = {{4th Generation Intel� Core vPro Processors with Intel� Virtual Machine Control Structure Shadowing (Intel� VMCS Shadowing)}},
+  Title                    = {{4th Generation Intel\^{A}\^{A}\^{A}® Core\^{a}\^{A}\^{A}\^{A}\^{A}¢ vPro\^{a}\^{A}\^{A}\^{A}\^{A}¢ Processors with Intel\^{A}\^{A}\^{A}® Virtual Machine Control Structure Shadowing (Intel\^{A}\^{A}\^{A}® VMCS Shadowing)}},
 
   Url                      = {http://www.intel.com/content/www/us/en/it-management/intel-it-best-practices/intel-vmcs-shadowing-paper.html}
 }
