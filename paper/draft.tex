@@ -103,12 +103,11 @@ Furthermore, our architecture mushrooms commodity and micro hypervisors to lever
 
 \section{Introduction}
 \label{ref:intro}
-Cloud computing platform are a solid reality nowadays. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation in order to meet the user needings.
-However, currently deployed cloud platforms present still several limitation. 
+Cloud computing platform are a solid reality nowadays. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation in order to meet the user needings. However, currently deployed cloud platforms present still several limitation. 
 
-First, it is still difficult to deliver cloud applications which are able to transparently leverage over several platform resources. The concept of SuperCloud \cite{art:blan, xclo:blank} addresses this kind of problems. Multi-platform coordination primarily for different standard and several format lock-in. Unfortunately, those lock-in are not only due to market strategical decisions but they also reflects the virtualization technology heterogeneity. For example, each cloud provider could use a different storage system or a different format to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them and this generally prevents leveraging on some popular features like `` VM live migration'' between different platform. Moreover, this incompatibility could also be enlarged if we consider that several platforms adopts one or more different virtualization techniques. In addition, this situation induce a tight dependency between the customer and the cloud provider and hardens the possibility to guarantee the availability of service in presence of a certain provider or to put in place some geographical optimization due to cost or traffic origin. The result was that some data server failures in the past has been catastrophic, causing a prolonged outage of service for a plenty of applications.. In the remaining part of the work, we will refer to those issues as ``horizontal'' requirements, that shows straightforwardly their multi-platform nature.
+First, it is still difficult to deliver cloud applications which are able to transparently leverage over several platform resources. The concept of SuperCloud~\cite{art:blan, xclo:blank} addresses this kind of problems. Multi-platform coordination primarily for different standard and several format lock-in. Unfortunately, those lock-in are not only due to market strategical decisions but they also reflects the virtualization technology heterogeneity. For example, each cloud provider could use a different storage system or a different format to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them and this generally prevents leveraging on some popular features like `` VM live migration'' between different platform. Moreover, this incompatibility could also be enlarged if we consider that several platforms adopts one or more different virtualization techniques. In addition, this situation induce a tight dependency between the customer and the cloud provider and hardens the possibility to guarantee the availability of service in presence of a certain provider or to put in place some geographical optimization due to cost or traffic origin. The result was that some data server failures in the past has been catastrophic, causing a prolonged outage of service for a plenty of applications.. In the remaining part of the work, we will refer to those issues as ``horizontal'' requirements, that shows straightforwardly their multi-platform nature.
 
-The second class of issues concerns platform integrity and user data privacy. On one hand, from an user-centric point of view, the user would like to preserve privacy of its data when it stores data on the cloud platform. However, hypervisor is normally the most privileged task executed in the platform and therefore a curious or malicious administrator could easily retrieve those data \cite{cloudvisor:zhang}. Moreover, in multi-tenancy cloud platform, a user shares the same physical resources with other users. Several works \cite{sec:you, bot:att} showed the potential threat and risks of attacks issued by other users located on the same physical resource.
+The second class of issues concerns platform integrity and user data privacy. On one hand, from an user-centric point of view, the user would like to preserve privacy of its data when it stores data on the cloud platform. However, hypervisor is normally the most privileged task executed in the platform and therefore a curious or malicious administrator could easily retrieve those data~\cite{cloudvisor:zhang}. Moreover, in multi-tenancy cloud platform, a user shares the same physical resources with other users. Several works~\cite{sec:you, bot:att} showed the potential threat and risks of attacks issued by other users located on the same physical resource.
 On the other hand, from a user-centric point of view, it is difficult to observe and inspect deeply the functioning of the whole platform, leveraging commodity general purpose hypervisors (GPHs).GPHs are executed at the most privileged level and so, it is complicated to detect and intervene on them in presence of malicious attack or misbehavior, without service interruption for all VMs hosted on the server. 
 To sum up, both visions collide with the execution of the hypervisor at the highest level of privileged. This attitude prevents the platform administrator from a real monitoring of the whole platform, but also the possibility for users to concretely inspects actions that platform administrators do on user data. A major challenge of new generation cloud platform is to alleviate this different tension, finding an acceptable trade-off. In the following paragraphs, we will make reference to this class of problem as ``Vertical'' requirements.
 
@@ -142,9 +141,13 @@ Id & Functional design Principle & Class &\\
       \end{tabular}
 \end{table}
 
-The reste of the paper in organized as follows. In Section 2 we start analyzing related work. In section 3, we analyze current limitations of classical nested virtualization approach and in section 4 we analyze the microvisor approach. In section 5 we analyzes cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before. Furthermore, in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section  in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section 8. 
+This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
+%Furthermore, in Section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles.
+In Section~\ref{sec:conclu}, we conclude the paper with future works and our vision of the SuperCloud.
+% in section in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section 8.
  
 \section{Related Work}
+\label{sec:rw}
 % Intro + performance issues
 Several works presented in literature integrates these a subset of this design principles in their architecture, leveraging nested virtualization \cite{turtle:ibm,art:blan, cloudvisor:zhang}
 Cloud computing feature set could be enlarged exploiting two layers of virtualization instead of just one. The presence of two different hypervisors allows the possibility to specialize hypervisors functions. Instead of having a general purpose hypervisor we could split the hypervisor role in two different layers, interconnected with a well defined interface.
@@ -161,6 +164,7 @@ Other approaches leveraging only one layer of virtualization does not achieve th
 Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented an dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach of  demoting the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
 
 \section{Classic nested virtualization approach}
+\label{sec:classic}
 
 Nested virtualization refers to a system architecture with two layers of virtualization. It consists in a ``virtualized'' virtualization, where the guest system virtualize a nested guest. The concept could be generalized to an arbitrary number of nested guest layers, introducing recursive virtualization.
 %More formally, Popek \& Golberg \cite{Popek:1974:FRV:361011.361073} discussed this subject, introducing the concept of ``recursively virtualizable'' machine and giving an initial definition of recursive virtual machines: If it is possible for a virtual machine to run under itself a copy of the VMM that could also exhibit all the properties of the VMM and this procedure could be repeated until the resources of the systems are consumed, then the original machine is recursively virtualizable.
@@ -192,6 +196,7 @@ To sum up, current nested virtualization limits are represented by a certain lac
 The first one is being addressed by hypervisor developers. The second one could simply not be achieved with modern hypervisors. 
 
 \section{Microhypervisor}
+\label{sec:mh}
 
 %\begin{figure}
 %\caption{GPH TCB comparison \cite{nova}}
@@ -221,8 +226,8 @@ Moreover, as reported in previous sections, several cloud computing issues are s
 
 Finally, microkernel modularization introduce a major challenge in architecture design. Due the increased complexity, for sake of kernel size, MH could generally lack of several virtualization features, commonly available on modern GPH hypervisor. For instance, XMHF does not support multiple guests. This kind of drawbacks could limits the potential interest in MH, even they are able to introduce several important features.
 
-
 \section{Architecture comparison}
+\label{sec:archcomp}
 
 \begin{figure*}
 \begin{center}
@@ -232,8 +237,7 @@ Finally, microkernel modularization introduce a major challenge in architecture 
 \label{fig:io}
 \end{figure*}
 
-
-The adoption of an extra layer of virtualization is capable to introduce a remarkable set of new features but it does not reduce the dimension of Trusted Code Base (TCB). 
+The adoption of an extra layer of virtualization is capable to introduce a remarkable set of new features but it does not reduce the dimension of Trusted Code Base (TCB).
 MH could represent a new approach to improve the potential benefits provided by the adoption of nested virtualization. In the following subsections, it will presented the four possible architectures achievable ``nesting'' of GPH and MH, underlying potentialities, drawbacks and potential cost of implementation.
 
 \subsection{GPH over GPH}
@@ -243,8 +247,8 @@ Supposing the completeness and the correctness of nested virtualization hardware
 
 To sum up, it could be possible to achieve live-migration between different platform and other features related to VM management flexibility but it could not still be possible to reduce the TCB. Analyzing MH approaches, the aim is try at most to retain to features, trying to introduce isolation and privacy improvements due to the lower TCB promised.
 
-%Although this architectures presents an extra layer between the nested guest, normally controlled by the cloud user and the system critical part, L0, the latter is far from a satisfying security level. The TCB of KVM that is represented by the entire Linux Kernel is normally around 200 KLoCs, considering the medium size of a deployed Linux kernel. 
-%Moreover, default KVM configuration does not provide a transparent protection mechanism between different VMs, so that compromising one instance of QEMU, that is executed in user-space, an attacker could compromise all the others VMs on the platform. 
+%Although this architectures presents an extra layer between the nested guest, normally controlled by the cloud user and the system critical part, L0, the latter is far from a satisfying security level. The TCB of KVM that is represented by the entire Linux Kernel is normally around 200 KLoCs, considering the medium size of a deployed Linux kernel.
+%Moreover, default KVM configuration does not provide a transparent protection mechanism between different VMs, so that compromising one instance of QEMU, that is executed in user-space, an attacker could compromise all the others VMs on the platform.
 
 \subsection{MH over MH}
 
@@ -316,7 +320,7 @@ In the previous sections we proposed a functional analysis of cloud architecture
 \item \textbf{Inter-platform support} Executed as L1, Xen would virtualize its nested guest initially using PV delivering the compatibility layer.
 \item \textbf{Tiny TCB} The NOVA kernel will represent the only part of the platform executed at the highest level of privilege. Even the VMM, Vancouver, will be executed in the L0 user-space. The micro-kernel in L0 enforces a strictly modular approach to L0. Therefore, the VMM will present distinct processes instances for each L1 guest, enforcing a context division.
 \item \textbf{3rd part compatibility} From a user point of view the architecture still exports the same interfaces provided by the Xen hypervisor, allowing the user to keep its applications unchanged.
-\item \textbf{Fail-safe components architecture}  Moreover, the tiny core is the only safety-critical software component. The system could potentially be able to recover any crash in different user-space components.
+\item \textbf{Fail-safe components architecture} Moreover, the tiny core is the only safety-critical software component. The system could potentially be able to recover any crash in different user-space components.
 \end{itemize}
 
 %
@@ -351,6 +355,7 @@ In the previous sections we proposed a functional analysis of cloud architecture
 %Therefore, leveraging NOVA as L0 our platform could propose inter-platform features to the user. We have the opportunity to exploit a complete cloud toolkit with the Xen hypervisor implementing features like inter-platform migration and improved redundancy, as described in the Xen Blanket approach.
 
 \section{Conclusion and future Works}
+\label{sec:conclu}
 
 %Future works will firstly concern the study of available MH, trying to identify which project could be suitable to act as L0 in a GPH over MH platform. As underlined previously, the key feature of L0 MH will be the capacity of having a tiny TCB. Moreover, additional requirements concerns the flexibility in terms VMs ( number of VM supported at the same time, CPU handling, I/O management). Finally, another criteria for choosing the L0 hypervisor will be the evaluated effort needed for integrating a nested HV extension the to the base project.
 %On the other hand, L1 choice is much simpler. Previous analysis identified Xen as the most suitable hypervisor for this role. The capacity to support different virtualization techniques added to the ability of running without HV support, makes Xen suitable to act as compatibility layer. 
