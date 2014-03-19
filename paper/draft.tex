@@ -7,17 +7,18 @@
 %\addbibresource{biblio.bib}
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{booktabs}
-\usepackage{array} 
-\usepackage{paralist} 
+\usepackage{array}
+\usepackage{paralist}
 \usepackage{verbatim} 
 \usepackage{amsfonts}
-\usepackage{fancyhdr} 
-%\pagestyle{fancy} 
+\usepackage{fancyhdr}
+\usepackage{times}
+%\pagestyle{fancy} % options: empty , plain , fancy
 %\renewcommand{\headrulewidth}{0pt} % customise the layout...
 %\lhead{}\chead{}\rhead{}
 %\lfoot{}\cfoot{\thepage}\rfoot{}
 
-\title{Bridging [TBD]}
+\title{ Bridging [TBD]}
 
 \author{
 \numberofauthors{3}
@@ -53,18 +54,18 @@ Furthermore, our architecture mushrooms commodity and micro hypervisors to lever
 \section{Introduction}
 \label{sec:intro}
 
-Cloud computing platform are a solid reality nowadays. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation in order to meet the user needings. However, currently deployed cloud platforms present still several limitation. 
+Cloud computing platform are a solid reality nowadays. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation in order to meet the user needings. However, currently deployed cloud platforms present still several limitations. 
 
 First, it is still difficult to deliver cloud applications which are able to transparently leverage over several platform resources. The concept of SuperCloud~\cite{art:blan, xclo:blank} addresses this kind of problems. Multi-platform coordination primarily for different standard and several format lock-in. Unfortunately, those lock-in are not only due to market strategical decisions but they also reflects the virtualization technology heterogeneity. For example, each cloud provider could use a different storage system or a different format to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them and this generally prevents leveraging on some popular features like `` VM live migration'' between different platform. Moreover, this incompatibility could also be enlarged if we consider that several platforms adopts one or more different virtualization techniques. In addition, this situation induce a tight dependency between the customer and the cloud provider and hardens the possibility to guarantee the availability of service in presence of a certain provider or to put in place some geographical optimization due to cost or traffic origin. The result was that some data server failures in the past has been catastrophic, causing a prolonged outage of service for a plenty of applications.. In the remaining part of the work, we will refer to those issues as ``horizontal'' requirements, that shows straightforwardly their multi-platform nature.
 
 The second class of issues concerns platform integrity and user data privacy. On one hand, from an user-centric point of view, the user would like to preserve privacy of its data when it stores data on the cloud platform. However, hypervisor is normally the most privileged task executed in the platform and therefore a curious or malicious administrator could easily retrieve those data~\cite{cloudvisor:zhang}. Moreover, in multi-tenancy cloud platform, a user shares the same physical resources with other users. Several works~\cite{sec:you, bot:att} showed the potential threat and risks of attacks issued by other users located on the same physical resource.
-On the other hand, from a user-centric point of view, it is difficult to observe and inspect deeply the functioning of the whole platform, leveraging commodity general purpose hypervisors (GPHs).GPHs are executed at the most privileged level and so, it is complicated to detect and intervene on them in presence of malicious attack or misbehavior, without service interruption for all VMs hosted on the server. 
+On the other hand, from a user-centric point of view, it is difficult to observe and inspect deeply the functioning of the whole platform, leveraging commodity general purpose hypervisors (GPHs). GPHs are executed at the most privileged level and so, it is complicated to detect and intervene on them in presence of malicious attack or misbehavior, without service interruption for all VMs hosted on the server. 
 To sum up, both visions collide with the execution of the hypervisor at the highest level of privileged. This attitude prevents the platform administrator from a real monitoring of the whole platform, but also the possibility for users to concretely inspects actions that platform administrators do on user data. A major challenge of new generation cloud platform is to alleviate this different tension, finding an acceptable trade-off. In the following paragraphs, we will make reference to this class of problem as ``Vertical'' requirements.
 
 To resume, in order to present a complete view of the architecture, we identified five key design principles, that a cloud computing platform has to implement in order to solve the cited problems. In the following paragraphs, those principles will represent a grid of analysis of different architectures.
 \begin{itemize}[]
-\item \textbf{DP1 User-Data privacy} A curious or malicious administrator ( or another platform user) would not have the right to inspect and analyze user data and instances, without the explicit consensus with the user above mutually trusted services. User-data privacy is a major challenge of modern cloud platforms. It is important to identify a trade-off that allows providers to identify and intervene on possible menaces, but also guarantee the impossibility for a curious or malicious operator to access to them without restrictions. In order to respect this principle when a platform administrator manages the platform it has not the highest level of privilege and each action on users object that he wants to deliver has to be validated by a mutually-trusted core, executed at the highest level of privilege. Moreover, this mutually-trust core has also to apply memory page cipher/uncipher in order to prevent memory page snooping when a page is swapped out.
-\item \textbf{DP2 Fail-Safe modular architecture} In order to recover soft failures, the archtecure is supposed to be fail-safe, being able of automatically migrate instances or user-data in presence of a menace, but also reactivating the correct functioning in presence of a software failure. In order to satisfy this property, the amount of safety-critical components has to be as lowest as possible and the overall design has to be kept as modular as possible
+\item \textbf{DP1 User-Data privacy} A curious or malicious administrator (or another platform user) would not have the right to inspect and analyze user data and instances, without the explicit consensus with the user above mutually trusted services. User-data privacy is a major challenge of modern cloud platforms. It is important to identify a trade-off that allows providers to identify and intervene on possible menaces, but also guarantee the impossibility for a curious or malicious operator to access to them without restrictions. In order to respect this principle when a platform administrator manages the platform it has not the highest level of privilege and each action on users object that he wants to deliver has to be validated by a mutually-trusted core, executed at the highest level of privilege. Moreover, this mutually-trust core has also to apply memory page cipher/uncipher in order to prevent memory page snooping when a page is swapped out.
+\item \textbf{DP2 Fail-Safe modular architecture} In order to recover soft failures, the archtecure is supposed to be fail-safe, being able of automatically migrate instances or user-data in presence of a menace, but also reactivating the correct functioning in presence of a software failure. In order to satisfy this property, the amount of safety-critical components has to be as lowest as possible and the overall design has to be kept as modular as possible.
 \item \textbf{DP3 Small TCB} The amount of lines of code executed at the highest level of privilege is normally proportional to the number of potential failures and bugs in the platform. According to this, an architecture presenting a tiny TCB will improve its safety and integrity properties by design.
 \item \textbf{DP4 Inter-platform support} The cloud architecture has to be designed in order to support directly different platforms and service providers. The same user virtual instances have to be executed (and potentially migrated) unmodified over different platforms.
 \item \textbf{DP5 3rd part compatibility} Avoid disruption of existing 3rd part applications compatibility could represent a major principle to consider. Platform interfaces has to be kept as close as possible to the existing one, preventing application rewrite.
@@ -88,7 +89,7 @@ Id & Functional design Principle & Class &\\
    DP5 & Backwards 3rd part compatibility & Horizontal \\
    NDP1 & Minimize code addition & & \\
 \bottomrule
-\end{tabular}
+      \end{tabular}
 \end{table}
 
 This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{sec:classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
@@ -113,21 +114,21 @@ To sum up, no architecture had been presented to address vertical and horizontal
 Other approaches leveraging only one layer of virtualization does not achieve the whole design-principle satisfaction. Self-service cloud approach (SSC) \cite{ssc:art} design a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures, in order to alleviate the different needing user-centric and provider-centric vision of cloud computing presented in \ref{sec:intro}. Even if this architecture reproduces an approach similar to the SuperCloud without leveraging an extra layer of virtualization (DP4), the approach changes the behavior where the user acts introducing new components that have to be directly managed by the user. Therefore, the main drawback of this solution is to change the interface with the user, preventing the possibility to straightforwardly move to the new platform without having to change its applications (DP5).
 
 % Integration NDSS Taming
-Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach of demoting the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
+Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach defining  the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
 
 \section{Classic nested virtualization approach}
 \label{sec:classic}
 
-Nested virtualization refers to a system architecture with two layers of virtualization. It consists in a ``virtualized'' virtualization, where the guest system virtualize a nested guest. The concept could be generalized to an arbitrary number of nested guest layers, introducing recursive virtualization.
+Nested virtualization refers to a system architecture with two layers of virtualization. It consists in a ``virtualized'' virtualization, where the guest system virtualize a nested guest. The concept could be generalized to an arbitrary number of nested guest layers, introducing recursive virtualization. Virtualization is able to execute in a deprivileged context  that normally requires a privileged execution. With nested virtualization we could apply this approach even to virtualization itself, executing a deprivileged hypervisor and leveraging code reutilization.
 %More formally, Popek \& Golberg \cite{Popek:1974:FRV:361011.361073} discussed this subject, introducing the concept of ``recursively virtualizable'' machine and giving an initial definition of recursive virtual machines: If it is possible for a virtual machine to run under itself a copy of the VMM that could also exhibit all the properties of the VMM and this procedure could be repeated until the resources of the systems are consumed, then the original machine is recursively virtualizable.
 
 Introducing nested virtualization, we have to identify the two main actors involved in the virtualization process: bare-metal hypervisor (L0) and nested hypervisor (L1). In addition, we will refer to the nested guest as L2 guest. 
-However, virtualization introduces a computational overhead. It is small when we are dealing with single layer virtualization, but it grows exponentially when we try to add further levels \cite{rec:virt}. This huge performance overhead has prevented nested virtualization adoption during last years and had been finally addressed by Ben Yehuda et Al \cite{turtle:ibm} proposing an architecture with acceptable overhead.
+However, virtualization introduces a computational overhead. It is normally acceptable when we are dealing with single layer virtualization, but it grows exponentially when we try to add further levels \cite{rec:virt}. This huge performance overhead has prevented nested virtualization adoption during last years and had been finally addressed by Ben Yehuda et Al \cite{turtle:ibm} proposing an architecture with acceptable overhead.
 
 Nested virtualization feasibility opened a plenty of new possibilities and perspectives, that have been largely discussed in literature \cite{rec:virt,turtle:ibm,art:blan}. The first aspect in common among different works proposed in literature is to diversify hypervisor functions, introducing new features but keeping the existing ones. In a general analysis of existing works, it could be possible to identify the general role of each different layer.
 On one hand, L0 is charged of the vertical aspects of the platform. It has to achieve  the best possible performances and enforcing the strongest possible level of isolation. L0 represents the last line of defense of the platform and a privileged point of global status observation.
 
-On the other hand, L1 is responsible for horizontal feature set. it has to provide the widest possible support to different platforms and the capacity to virtualize adopting different techniques ( para-virtualization, hardware-assisted, dynamic binary translation). According to these requirements, Williams et al. \cite{art:blan} propose a patched version of Xen, Xen Blanket, to accomplish a L1 virtualization layer, designed to run over different platforms. This concretely allows to run over different physical platform the same VM, and live-migrate it at the occurrence.
+On the other hand, L1 is responsible for horizontal feature set. It has to provide the widest possible support to different platforms and the capacity to virtualize adopting different techniques (para-virtualization, hardware-assisted, dynamic binary translation). According to these requirements, Williams et al. \cite{art:blan} propose a patched version of Xen, Xen Blanket, to accomplish a L1 virtualization layer, designed to run over different platforms. This concretely allows to run over different physical platform the same VM, and live-migrate it at the occurrence.
 
 \subsection{Classical nested virtualization limits}
 
@@ -144,7 +145,7 @@ Secondly, due to the monolithic architecture, each feature introduced in GPH enl
 Finally, the above architecture does not improve the overall stability of the infrastructure. The underlying core, L0, has the same problem of single-layer GPH architecture: the large TCB implies also that a failure experienced in one of the critical components will simply produce a generalized failure of the whole platform, not satisfying DP2. Moreover, in GPH standard architecture, the administrator has the entire control of the platform and could potentially snoop and inspect user VM status and data.
 
 This kind of architecture, in particular, does not leverage completely the possibility to hide behind a compatible layer, a really modular architecture with only a tiny critical core.
-To sum up, current nested virtualization limits are represented by a certain lack of dedicated feature in modern hypervisor and the impossibility to rely on a tiny TCB (DP3,DP4).
+To sum up, current nested virtualization limits are represented by a certain lack of dedicated feature in modern hypervisor and the impossibility to rely on a tiny TCB (DP3, DP4).
 The first one is being addressed by hypervisor developers. The second one could simply not be achieved with modern hypervisors. 
 
 \section{Microhypervisor}
@@ -205,7 +206,7 @@ To sum up, it could be possible to achieve live-migration between different plat
 \subsection{MH over MH}
 
 MH on MH in reported only to see the orthogonality between this approach and GPH over GPH.
-A theoretical implementation of MH over MH will provide the vertical requirements that are missing in the previous approach. The tiny core could be able to overcome monolithic problems due to privilege level of adminitration tasks (DP1), the possibility to improve the resilience of the platform to a large set of software failures (DP2) and finally reduce the possibility of the vulnerabilities of the most privilege part of the software (DP3). However, the interest on such architecture is limited because it is not able to overcome any cited issues of single-layer MH. Moreover, several horizontal properties are theoretically achievable but they will require a huge effort in developing functions of interest. Moreover, the lack of nested VMX functionalities prevents to concretely test this kind of architecture, because MH normally rely on VMX facilities in order to create a nested HVM guests.
+A theoretical implementation of MH over MH will provide the vertical requirements that are missing in the previous approach. The tiny core could be able to overcome monolithic problems due to privilege level of administration tasks (DP1), the possibility to improve the resilience of the platform to a large set of software failures (DP2) and finally reduce the possibility of the vulnerabilities of the most privilege part of the software (DP3). However, the interest on such architecture is limited because it is not able to overcome any cited issues of single-layer MH. Moreover, several horizontal properties are theoretically achievable but they will require a huge effort in developing functions of interest. Moreover, the lack of nested VMX functionalities prevents to concretely test this kind of architecture, because MH normally rely on VMX facilities in order to create a nested HVM guests.
 To conclude, nested virtualization is exploited in order to fill eco-systems gaps with GPH but MH over MH does not provide any improvement in this sense.
 
 \subsection{MH over GPH}
@@ -221,7 +222,6 @@ However, the amount of code running in L0 kernel space is still as big as before
 Finally, adopting a MH as L1 prevents to use inter-platform enhanced features. As analyzed when dealing with MH design, the price of having a tiny core is normally paid with a lack of certain functionalities. For example, XMHF only supports one single guest. It could be easily noticed that this approach is not architecturally able to provide any new "horizontal" features, leveraging on nested virtualization. Therefore, the architecture is only able to provide the same features that are provided by today deployed ones, with an enhanced but not sufficient level of isolation.
 
 \subsection{GPH over MH}
-
 \label{par:gom}
 
 \begin{table*}
@@ -249,7 +249,7 @@ More generally, from an architectural point of view, the general MH minimalist a
 
 Another important class is the necessity to explicit hardware devices support. Device drivers represents a general Achilles' heel of MH, due the general cost of development. However, this class of problem could be addressed leveraging device assignment. L1 GPH hypervisor will handle the real device, using the proper driver now demoted to run in a lower level of privilege. It has to be underlined that this solution could represent a feasible approach only if it possible to overcome the exclusive allocation trouble (SR-IOV).
  
-\subsection{Conclusion}
+\subsection{Lessons learned}
 
 To conclude, this section provides a short comparison between different platforms, contrasting architecture features above the two main different types of benefits given by nested virtualization, as reported widely in literature \cite{art:blan, nested:berghmans,  cloudvisor:zhang, turtle:ibm}. The first could be identified in the augmented degree of isolation the architecture could enforce between host OS and the "customer" point of access, allowing to redesign the security architecture of the whole platform. The second one is represented by the possibility to leverage multiple virtualization layers to easily define inter-platform policy and operations between different platforms.
 In table \ref{fin:conf}, it is possible a summary of the previous analysis. To conclude, GPH over MH is the most interesting one in order to enlarge nested virtualization promised benefit. This architecture with a solid and secured MH as L0 is the only able to reduce the platform TCB and this could be a key point to obtain more protected infrastructure, .
@@ -264,8 +264,15 @@ However, it has not be underestimated, however, that para-virtualization support
 %This will relief the MH of a part of devices management, giving to the GPH the responsibility to drive concretely the device but without losing interesting features. Therefore, we will need a limited amount of code to handle device without have to deal with each specific device.
 
 To sum up,  the adoption of MH could  increase feature set introduced by nested virtualization adoption. The first impeding problem is the implementation of MH, able to propose to guest to virtualize with hardware assistance. In next section, we present an implementation of GPH over MH, that try to circumvent this limitation leveraging paravirtualization.
- \section{Implementation}
-In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA.
+
+\section{Security Architecture}
+\label{ref:arch}
+
+\section{Vertical properties}
+
+\section{Implementation}
+In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA \cite{nova}.
+
 
 \begin{itemize}[]
 \item \textbf{Inter-platform support} Executed as L1, Xen would virtualize its nested guest initially using PV delivering the compatibility layer.
@@ -308,11 +315,23 @@ In the previous sections we proposed a functional analysis of cloud architecture
 \section{Conclusion and future Works}
 \label{sec:conclu}
 
-%Future works will firstly concern the study of available MH, trying to identify which project could be suitable to act as L0 in a GPH over MH platform. As underlined previously, the key feature of L0 MH will be the capacity of having a tiny TCB. Moreover, additional requirements concerns the flexibility in terms VMs ( number of VM supported at the same time, CPU handling, I/O management). Finally, another criteria for choosing the L0 hypervisor will be the evaluated effort needed for integrating a nested HV extension the to the base project.
+In previous sections we provided a global analysis of modern challenges of cloud computing  and how those could be globally addressed addressed leveraging nested virtualization and different hypervisor architectures. 
+
+Future works will be focused on two complementary parts.
+Firstly, they will concern the completion of the architecture of security in order to concretely meet horizontal design principles, identifying key components, similarly as done for the vertical properties.
+At the same time, a major effort will be directed on enlarging the initial implementation.
+
 %On the other hand, L1 choice is much simpler. Previous analysis identified Xen as the most suitable hypervisor for this role. The capacity to support different virtualization techniques added to the ability of running without HV support, makes Xen suitable to act as compatibility layer. 
 %
 %After this initial study, the first step will be deploying a minimal nested architecture testing ``out-of-the-box'' features and limitations. The following part will concern the conception of patch and extensions in order to adapt the general design of MH to properly act as L0.
 %The final goal is to provide an architecture able to leverage nested virtualization cloud platforms improvements, having a smaller TCB and allowing customers to leverage flexible migrations and scheduling.
+
+
+%\section{Conclusion}
+%{\scriptsize
+%\bibliographystyle{abbrv}
+%\bibliography{biblio}
+%}
 
 {\scriptsize
 \bibliographystyle{abbrv}
