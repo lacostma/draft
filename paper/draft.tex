@@ -18,7 +18,7 @@
 %\lhead{}\chead{}\rhead{}
 %\lfoot{}\cfoot{\thepage}\rfoot{}
 
-\title{ Bridging [TBD]}
+\title{From Nested Virtualization Architecture \\To 2D Security Management for Distributed Clouds}
 
 \author{
 \numberofauthors{3}
@@ -117,7 +117,7 @@ Other approaches leveraging only one layer of virtualization does not achieve th
 % Integration NDSS Taming
 Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach defining  the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
 
-\section{Tradidional Nested Virtualization}
+\section{Current Nested Virtualization}
 \label{sec:classic}
 
 Nested virtualization refers to a system architecture with two layers of virtualization. It consists in a ``virtualized'' virtualization, where the guest system virtualize a nested guest. The concept could be generalized to an arbitrary number of nested guest layers, introducing recursive virtualization. Virtualization is able to execute in a deprivileged context  that normally requires a privileged execution. With nested virtualization we could apply this approach even to virtualization itself, executing a deprivileged hypervisor and leveraging code reutilization.
@@ -131,7 +131,7 @@ On one hand, L0 is charged of the vertical aspects of the platform. It has to ac
 
 On the other hand, L1 is responsible for horizontal feature set. It has to provide the widest possible support to different platforms and the capacity to virtualize adopting different techniques (para-virtualization, hardware-assisted, dynamic binary translation). According to these requirements, Williams et al. \cite{art:blan} propose a patched version of Xen, Xen Blanket, to accomplish a L1 virtualization layer, designed to run over different platforms. This concretely allows to run over different physical platform the same VM, and live-migrate it at the occurrence.
 
-\subsection{Classical nested virtualization limits}
+\subsection{Limits}
 
 Nowadays, nested virtualization presents several limits related to the hardware support and software state of implementation. At first, to provide nested virtualization, hypervisors has to provide an exact copy of hardware virtualization facilities. The most exploited technique, full virtualization with hardware assistance (HV), relies on a quite complex dedicated support.
 This set of facilities assists instruction emulation, memory address translation and device management. Both Xen and KVM propose nested VMX/SVN features, that consists in the possibility to efficiently handle nested hardware virtualization, in presence of a single-layer hardware facilities.
@@ -149,7 +149,7 @@ This kind of architecture, in particular, does not leverage completely the possi
 To sum up, current nested virtualization limits are represented by a certain lack of dedicated feature in modern hypervisor and the impossibility to rely on a tiny TCB (DP3, DP4).
 The first one is being addressed by hypervisor developers. The second one could simply not be achieved with modern hypervisors. 
 
-\section{Microhypervisor}
+\section{Micro-hypervisors}
 \label{sec:mh}
 
 %\begin{figure}
@@ -172,7 +172,7 @@ In addition, MH inherits the concept of micro-kernel to implement different ``pe
 Finally, this extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity.  A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
 In addition, this approach is not far from the one proposed in DeHype \cite{wu2013TamHosHypMosDepExe}, where a consistent part of the KVM hypervisor has been demoted in user-space.
 
-\subsection {MH general issues}
+\subsection {MH General Issues}
 
 Despite the positives, MH approaches had demonstrated some limitations. Firstly, the straightforward one is the initial lack of hardware support, lack of device drivers are still a relevant Achilles' heel for this solutions, inherited from its ancestors microkernels. Fortunately, this kind of issue could be addressed leveraging I/O passthrough techniques, although it will cause exclusive allocation issues.
 
@@ -180,7 +180,7 @@ Moreover, as reported in previous sections, several cloud computing issues are s
 
 Finally, microkernel modularization introduce a major challenge in architecture design. Due the increased complexity, for sake of kernel size, MH could generally lack of several virtualization features, commonly available on modern GPH hypervisor. For instance, XMHF does not support multiple guests. This kind of drawbacks could limits the potential interest in MH, even they are able to introduce several important features.
 
-\section{Architecture comparison}
+\section{Architecture Comparison}
 \label{sec:archcomp}
 
 \begin{figure*}
@@ -194,7 +194,7 @@ Finally, microkernel modularization introduce a major challenge in architecture 
 The adoption of an extra layer of virtualization is capable to introduce a remarkable set of new features but it does not reduce the dimension of Trusted Code Base (TCB).
 MH could represent a new approach to improve the potential benefits provided by the adoption of nested virtualization. In the following subsections, it will presented the four possible architectures achievable ``nesting'' of GPH and MH, underlying potentialities, drawbacks and potential cost of implementation.
 
-\subsection{GPH over GPH}
+\subsection{GPH Over GPH}
 
 The first analyzed architecture concerns only GPH. At first, it is important to recall the most interesting achievable by such architectures. In particular, several remarkable features are live migration over different platform, transparent migration of virtualized clusters between different data-centers (horizontal requirements DP1).
 Supposing the completeness and the correctness of nested virtualization hardware facilities in widespread hypervisor, GPH over GPH satisfies all horizontal design principles, but it lacks in vertical DPs as the size of TCB is the same of currently deployed architectures.
@@ -204,13 +204,13 @@ To sum up, it could be possible to achieve live-migration between different plat
 %Although this architectures presents an extra layer between the nested guest, normally controlled by the cloud user and the system critical part, L0, the latter is far from a satisfying security level. The TCB of KVM that is represented by the entire Linux Kernel is normally around 200 KLoCs, considering the medium size of a deployed Linux kernel.
 %Moreover, default KVM configuration does not provide a transparent protection mechanism between different VMs, so that compromising one instance of QEMU, that is executed in user-space, an attacker could compromise all the others VMs on the platform.
 
-\subsection{MH over MH}
+\subsection{MH Over MH}
 
 MH on MH in reported only to see the orthogonality between this approach and GPH over GPH.
 A theoretical implementation of MH over MH will provide the vertical requirements that are missing in the previous approach. The tiny core could be able to overcome monolithic problems due to privilege level of administration tasks (DP1), the possibility to improve the resilience of the platform to a large set of software failures (DP2) and finally reduce the possibility of the vulnerabilities of the most privilege part of the software (DP3). However, the interest on such architecture is limited because it is not able to overcome any cited issues of single-layer MH. Moreover, several horizontal properties are theoretically achievable but they will require a huge effort in developing functions of interest. Moreover, the lack of nested VMX functionalities prevents to concretely test this kind of architecture, because MH normally rely on VMX facilities in order to create a nested HVM guests.
 To conclude, nested virtualization is exploited in order to fill eco-systems gaps with GPH but MH over MH does not provide any improvement in this sense.
 
-\subsection{MH over GPH}
+\subsection{MH Over GPH}
 \label{par:mog}
 
 The third architecture, proposed in order to reduce security concerns, is built combining an GPH at L0 and a MH at L1. 
@@ -222,7 +222,7 @@ An interesting point of this approach is the fact of being easily be deployed, w
 However, the amount of code running in L0 kernel space is still as big as before and, therefore, no TCB reduction. 
 Finally, adopting a MH as L1 prevents to use inter-platform enhanced features. As analyzed when dealing with MH design, the price of having a tiny core is normally paid with a lack of certain functionalities. For example, XMHF only supports one single guest. It could be easily noticed that this approach is not architecturally able to provide any new "horizontal" features, leveraging on nested virtualization. Therefore, the architecture is only able to provide the same features that are provided by today deployed ones, with an enhanced but not sufficient level of isolation.
 
-\subsection{GPH over MH}
+\subsection{GPH Over MH}
 \label{par:gom}
 
 \begin{table*}
@@ -250,7 +250,7 @@ More generally, from an architectural point of view, the general MH minimalist a
 
 Another important class is the necessity to explicit hardware devices support. Device drivers represents a general Achilles' heel of MH, due the general cost of development. However, this class of problem could be addressed leveraging device assignment. L1 GPH hypervisor will handle the real device, using the proper driver now demoted to run in a lower level of privilege. It has to be underlined that this solution could represent a feasible approach only if it possible to overcome the exclusive allocation trouble (SR-IOV).
  
-\subsection{Lessons learned}
+\subsection{Lessons Learned}
 
 To conclude, this section provides a short comparison between different platforms, contrasting architecture features above the two main different types of benefits given by nested virtualization, as reported widely in literature \cite{art:blan, nested:berghmans,  cloudvisor:zhang, turtle:ibm}. The first could be identified in the augmented degree of isolation the architecture could enforce between host OS and the "customer" point of access, allowing to redesign the security architecture of the whole platform. The second one is represented by the possibility to leverage multiple virtualization layers to easily define inter-platform policy and operations between different platforms.
 In table \ref{fin:conf}, it is possible a summary of the previous analysis. To conclude, GPH over MH is the most interesting one in order to enlarge nested virtualization promised benefit. This architecture with a solid and secured MH as L0 is the only able to reduce the platform TCB and this could be a key point to obtain more protected infrastructure, .
@@ -269,7 +269,7 @@ To sum up,  the adoption of MH could  increase feature set introduced by nested 
 \section{Security Architecture}
 \label{ref:arch}
 
-\section{Vertical properties}
+\section{Vertical Properties}
 
 \section{Implementation}
 In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA \cite{nova}.
@@ -313,7 +313,7 @@ In the previous sections we proposed a functional analysis of cloud architecture
 
 %Therefore, leveraging NOVA as L0 our platform could propose inter-platform features to the user. We have the opportunity to exploit a complete cloud toolkit with the Xen hypervisor implementing features like inter-platform migration and improved redundancy, as described in the Xen Blanket approach.
 
-\section{Conclusion and future Works}
+\section{Conclusion and Future Work}
 \label{sec:conclu}
 
 In previous sections we provided a global analysis of modern challenges of cloud computing  and how those could be globally addressed addressed leveraging nested virtualization and different hypervisor architectures. 
