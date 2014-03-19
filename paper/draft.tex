@@ -54,13 +54,14 @@ Furthermore, our architecture mushrooms commodity and micro hypervisors to lever
 \section{Introduction}
 \label{sec:intro}
 
-\noindent Cloud computing is now a solid reality. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation to meet user needs. However, currently deployed cloud infrastructures present several limitations. 
+\noindent Distributed cloud computing is now becoming a reality. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation to meet user needs. However, currently deployed distributed cloud infrastructures present several limitations.
 
-First, it is still difficult to deploy cloud applications able to transparently leverage resources of several heterogeneous platforms. The concept of super-cloud~\cite{art:blan, xclo:blank} tries notably to overcome such issues. Multi-platform coordination is hard, primarily due to lock-in to different standards such as VM formats. Unfortunately, such lock-in is not only due to market strategic decisions, but also reflects heterogeneity of virtualization technologies. For example, each cloud provider may use different storage systems or different formats to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them. This generally prevents leveraging some popular features like VM live migration between different platforms. Incompatibility is even greater if we consider that each platform may adopt several types of virtualization techniques. This situation induces a tight dependency between the customer and the cloud provider. It may prevent guaranteeing service availability by relying on alternative providers, or to set up geographical optimizations due to cost or origin of traffic. This has resulted in some dramatic data server failures in recent years, causing prolonged outage of service for many applications. In what follows, we refer to this class of challenges as \textit{horizontal}, to highlight their multi-platform nature.
+First, deploying cloud applications able to transparently leverage resources of several heterogeneous platforms is still difficult. The concept of super-cloud~\cite{art:blan, xclo:blank} tries notably to overcome such issues. Multi-platform coordination is hard, primarily due to lock-in to different standards such as VM formats. Unfortunately, such lock-in is not only due to market strategic decisions, but also reflects heterogeneity of virtualization technologies. For example, each cloud provider may use different storage systems or different formats to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them. This generally prevents leveraging some popular features like VM live migration between different platforms. Incompatibility is even greater if we consider that each platform may adopt several types of virtualization techniques. This situation induces a tight dependency between the customer and the cloud provider. It may prevent guaranteeing service availability by relying on alternative providers, or to set up geographical optimizations due to cost or origin of traffic. This has resulted in some dramatic data server failures in recent years, causing prolonged outage of service for many applications. In what follows, we refer to this class of multi-platform issues as \textit{horizontal} challenges.
 
-The second class of issues concerns platform integrity and user data privacy. On one hand, from an user-centric point of view, the user would like to preserve privacy of its data when it stores data on the cloud platform. However, hypervisor is normally the most privileged task executed in the platform and therefore a curious or malicious administrator could easily retrieve those data~\cite{cloudvisor:zhang}. Moreover, in multi-tenancy cloud platform, a user shares the same physical resources with other users. Several works~\cite{sec:you, bot:att} showed the potential threat and risks of attacks issued by other users located on the same physical resource.
-On the other hand, from a user-centric point of view, it is difficult to observe and inspect deeply the functioning of the whole platform, leveraging commodity general purpose hypervisors (GPHs). GPHs are executed at the most privileged level and so, it is complicated to detect and intervene on them in presence of malicious attack or misbehavior, without service interruption for all VMs hosted on the server. 
-To sum up, both visions collide with the execution of the hypervisor at the highest level of privileged. This attitude prevents the platform administrator from a real monitoring of the whole platform, but also the possibility for users to concretely inspects actions that platform administrators do on user data. A major challenge of new generation cloud platform is to alleviate this different tension, finding an acceptable trade-off. In the following paragraphs, we will make reference to this class of problem as ``Vertical'' requirements.
+Second, a number of issues have been raised about user data privacy and platform integrity. From the user perspective, users would like to preserve privacy of their data stored on the cloud platform. However, due to overprivileged hypervisors, a curious or malicious administrator could easily retrieve such data~\cite{cloudvisor:zhang}. In a multi-tenant cloud platform, physical resource sharing between users may lead not only to data leakage or but also attacks against the IaaS~\cite{bot:att, sec:you}.
+From the provider perspective, a key objective is to thus guarantee platform integrity against rogue VMs. However, commodity general-purpose hypervisors (GPHs) make it difficult to observe deeply all layers of a running IaaS platform. Indeed, running GPHs at the highest level of privilege hampers detection and reaction on the hypervisor itself in presence of faulty or malicious behavior -- unless to cause interruption of service for all hosted VMs. Thus, both user-centric and provider-centric visions of the cloud have a problem with overprivileged hypervisors.
+%: the platform administrator cannot perform in-depth infrastructure monitoring nor can users concretely inspect administrator actions on their data. 
+A major challenge for new generations of cloud infrastructures is thus to find acceptable trade-offs between such conflicting requirements. In what follows, we refer to this class of layer-oriented issues as \textit{vertical} challenges.
 
 To resume, in order to present a complete view of the architecture, we identified five key design principles, that a cloud computing platform has to implement in order to solve the cited problems. In the following paragraphs, those principles will represent a grid of analysis of different architectures.
 \begin{itemize}[]
@@ -82,14 +83,14 @@ In our analysis, it will be kept in consideration not only the overall suitabili
 \toprule
 Id & Functional design Principle & Class &\\
 \midrule
-   DP1 & User-Data privacy & Vertical & \\
-   DP2 & Fail-Safe modular architecture & Vertical & \\ 
-   DP3 & Small TCB & Vertical & \\
-   DP4 & Inter-platform support & Horizontal & \\
-   DP5 & Backwards 3rd part compatibility & Horizontal \\
-   NDP1 & Minimize code addition & & \\
+DP1 & User-Data privacy & Vertical & \\
+DP2 & Fail-Safe modular architecture & Vertical & \\ 
+DP3 & Small TCB & Vertical & \\
+DP4 & Inter-platform support & Horizontal & \\
+DP5 & Backwards 3rd part compatibility & Horizontal \\
+NDP1 & Minimize code addition & & \\
 \bottomrule
-      \end{tabular}
+\end{tabular}
 \end{table}
 
 This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{sec:classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
@@ -116,7 +117,7 @@ Other approaches leveraging only one layer of virtualization does not achieve th
 % Integration NDSS Taming
 Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach defining  the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
 
-\section{Classic nested virtualization approach}
+\section{Tradidional Nested Virtualization}
 \label{sec:classic}
 
 Nested virtualization refers to a system architecture with two layers of virtualization. It consists in a ``virtualized'' virtualization, where the guest system virtualize a nested guest. The concept could be generalized to an arbitrary number of nested guest layers, introducing recursive virtualization. Virtualization is able to execute in a deprivileged context  that normally requires a privileged execution. With nested virtualization we could apply this approach even to virtualization itself, executing a deprivileged hypervisor and leveraging code reutilization.
