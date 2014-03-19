@@ -1,76 +1,25 @@
-% !TEX TS-program = pdflatex
-% !TEX encoding = UTF-8 Unicode
-
-% This is a simple template for a LaTeX document using the "article" class.
-% See "book", "report", "letter" for other types of document.
-
 \documentclass{sig-alternate}
-%\usepackage[margin={1.5cm,3cm}]{geometry}
-%\setlength{\columnsep}{1cm}
-\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
-
-%%% Examples of Article customizations
-% These packages are optional, depending whether you want the features they provide.
-% See the LaTeX Companion or other references for full information.
-
-%%% PAGE DIMENSIONS
-%\usepackage{geometry} % to change the page dimensions
-%\geometry{a4paper} % or letterpaper (US) or a5paper or....
-% \geometry{margin=2in} % for example, change the margins to 2 inches all round
-% \geometry{landscape} % set up the page for landscape
-%   read geometry.pdf for detailed page layout information
+\usepackage[utf8]{inputenc} 
 %\usepackage[hidelinks]{hyperref}
 %\usepackage[autostyle,french=guillemets,babel]{csquotes}
 \usepackage{graphicx} % support the \includegraphics command and options
-\usepackage[backend=biber]{biblatex}
-\addbibresource{biblio.bib}
+%\usepackage[backend=biber]{biblatex}
+%\addbibresource{biblio.bib}
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
-%%% PACKAGES
-\usepackage{booktabs} % for much better looking tables
-\usepackage{array} %
-% for better arrays (eg matrices) in maths
-\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
-\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
-%\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
-% These packages are all incorporated in the memoir class to one degree or another...
+\usepackage{booktabs}
+\usepackage{array} 
+\usepackage{paralist} 
+\usepackage{verbatim} 
 \usepackage{amsfonts}
+\usepackage{fancyhdr} 
+%\pagestyle{fancy} 
+%\renewcommand{\headrulewidth}{0pt} % customise the layout...
+%\lhead{}\chead{}\rhead{}
+%\lfoot{}\cfoot{\thepage}\rfoot{}
 
-%%% HEADERS & FOOTERS
-\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
-\pagestyle{fancy} % options: empty , plain , fancy
-\renewcommand{\headrulewidth}{0pt} % customise the layout...
-\lhead{}\chead{}\rhead{}
-\lfoot{}\cfoot{\thepage}\rfoot{}
-
-%%% SECTION TITLE APPEARANCE
-%\usepackage{sectsty}
-%\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
-%% (This matches ConTeXt defaults)
-
-%%% ToC (table of contents) APPEARANCE
-%\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
-%\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
-%\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
-%\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
-
-%%% END Article customizations
-
-%%% The "real" document content comes below...
-
-\title{ Bridging [TBD]}
+\title{Bridging [TBD]}
 
 \author{
-% You can go ahead and credit any number of authors here,
-% e.g. one 'row of three' or two rows (consisting of one row of three
-% and a second row of one, two or three).
-%
-% The command \alignauthor (no curly braces needed) should
-% precede each author name, affiliation/snail-mail address and
-% e-mail address. Additionally, tag each line of
-% affiliation/address with \affaddr, and tag the
-% e-mail address with \email.
-%
-% 1st. author
 \numberofauthors{3}
 \alignauthor
 Alex Palesandro\\
@@ -85,7 +34,7 @@ Marc Lacoste\\
 \affaddr{Orange Labs, France}
 \texttt{marc.lacoste@orange.com}
 }
-%\setlist[itemize]{leftmargin=*}
+
 \begin{document}
 \maketitle
 
@@ -102,7 +51,8 @@ Furthermore, our architecture mushrooms commodity and micro hypervisors to lever
 }
 
 \section{Introduction}
-\label{ref:intro}
+\label{sec:intro}
+
 Cloud computing platform are a solid reality nowadays. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation in order to meet the user needings. However, currently deployed cloud platforms present still several limitation. 
 
 First, it is still difficult to deliver cloud applications which are able to transparently leverage over several platform resources. The concept of SuperCloud~\cite{art:blan, xclo:blank} addresses this kind of problems. Multi-platform coordination primarily for different standard and several format lock-in. Unfortunately, those lock-in are not only due to market strategical decisions but they also reflects the virtualization technology heterogeneity. For example, each cloud provider could use a different storage system or a different format to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them and this generally prevents leveraging on some popular features like `` VM live migration'' between different platform. Moreover, this incompatibility could also be enlarged if we consider that several platforms adopts one or more different virtualization techniques. In addition, this situation induce a tight dependency between the customer and the cloud provider and hardens the possibility to guarantee the availability of service in presence of a certain provider or to put in place some geographical optimization due to cost or traffic origin. The result was that some data server failures in the past has been catastrophic, causing a prolonged outage of service for a plenty of applications.. In the remaining part of the work, we will refer to those issues as ``horizontal'' requirements, that shows straightforwardly their multi-platform nature.
@@ -138,16 +88,17 @@ Id & Functional design Principle & Class &\\
    DP5 & Backwards 3rd part compatibility & Horizontal \\
    NDP1 & Minimize code addition & & \\
 \bottomrule
-      \end{tabular}
+\end{tabular}
 \end{table}
 
-This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
+This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{sec:classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
 %Furthermore, in Section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles.
 In Section~\ref{sec:conclu}, we conclude the paper with future works and our vision of the SuperCloud.
 % in section in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section 8.
  
 \section{Related Work}
 \label{sec:rw}
+
 % Intro + performance issues
 Several works presented in literature integrates these a subset of this design principles in their architecture, leveraging nested virtualization \cite{turtle:ibm,art:blan, cloudvisor:zhang}
 Cloud computing feature set could be enlarged exploiting two layers of virtualization instead of just one. The presence of two different hypervisors allows the possibility to specialize hypervisors functions. Instead of having a general purpose hypervisor we could split the hypervisor role in two different layers, interconnected with a well defined interface.
@@ -159,7 +110,7 @@ However, several works demonstrate that it is possible to put in place low overh
 
 To sum up, no architecture had been presented to address vertical and horizontal class of problems at the same time until now. XenBlanket does not investigate cloud architectural security concerns (DP3,DP2), limiting the focus on new potential feature of a coordinated multi-provider cloud. Cloudvisor proposed a security architecture that leverages nested virtualization without allowing the possibility of executing more than one nested hypervisor at time, that is a crucial requirements of a multi-provider cloud platform (DP4). In a SuperCloud scenario, each user has to run its own L1 hypervisor instance to enforce a compatibility layer, overcoming incompatibilities between different providers.
 
-Other approaches leveraging only one layer of virtualization does not achieve the whole design-principle satisfaction. Self-service cloud approach (SSC) \cite{ssc:art} design a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures, in order to alleviate the different needing user-centric and provider-centric vision of cloud computing presented in \ref{par:intro}. Even if this architecture reproduces an approach similar to the SuperCloud without leveraging an extra layer of virtualization (DP4), the approach changes the behavior where the user acts introducing new components that have to be directly managed by the user. Therefore, the main drawback of this solution is to change the interface with the user, preventing the possibility to straightforwardly move to the new platform without having to change its applications (DP5).
+Other approaches leveraging only one layer of virtualization does not achieve the whole design-principle satisfaction. Self-service cloud approach (SSC) \cite{ssc:art} design a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures, in order to alleviate the different needing user-centric and provider-centric vision of cloud computing presented in \ref{sec:intro}. Even if this architecture reproduces an approach similar to the SuperCloud without leveraging an extra layer of virtualization (DP4), the approach changes the behavior where the user acts introducing new components that have to be directly managed by the user. Therefore, the main drawback of this solution is to change the interface with the user, preventing the possibility to straightforwardly move to the new platform without having to change its applications (DP5).
 
 % Integration NDSS Taming
 Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach of demoting the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
@@ -171,9 +122,9 @@ Nested virtualization refers to a system architecture with two layers of virtual
 %More formally, Popek \& Golberg \cite{Popek:1974:FRV:361011.361073} discussed this subject, introducing the concept of ``recursively virtualizable'' machine and giving an initial definition of recursive virtual machines: If it is possible for a virtual machine to run under itself a copy of the VMM that could also exhibit all the properties of the VMM and this procedure could be repeated until the resources of the systems are consumed, then the original machine is recursively virtualizable.
 
 Introducing nested virtualization, we have to identify the two main actors involved in the virtualization process: bare-metal hypervisor (L0) and nested hypervisor (L1). In addition, we will refer to the nested guest as L2 guest. 
-However, virtualization introduces a computational overhead. It is small when we are dealing with single layer virtualization, but it grows exponentially when we try to add further levels \cite{rec:virt}. This huge performance overhead has prevented nested virtualization adoption during last years and had been finally addressed by Ben Yehuda et Al \cite{turtles:ibm} proposing an architecture with acceptable overhead.
+However, virtualization introduces a computational overhead. It is small when we are dealing with single layer virtualization, but it grows exponentially when we try to add further levels \cite{rec:virt}. This huge performance overhead has prevented nested virtualization adoption during last years and had been finally addressed by Ben Yehuda et Al \cite{turtle:ibm} proposing an architecture with acceptable overhead.
 
-Nested virtualization feasibility opened a plenty of new possibilities and perspectives, that have been largely discussed in literature \cite{rec:virt,turtles:ibm,art:blan}. The first aspect in common among different works proposed in literature is to diversify hypervisor functions, introducing new features but keeping the existing ones. In a general analysis of existing works, it could be possible to identify the general role of each different layer.
+Nested virtualization feasibility opened a plenty of new possibilities and perspectives, that have been largely discussed in literature \cite{rec:virt,turtle:ibm,art:blan}. The first aspect in common among different works proposed in literature is to diversify hypervisor functions, introducing new features but keeping the existing ones. In a general analysis of existing works, it could be possible to identify the general role of each different layer.
 On one hand, L0 is charged of the vertical aspects of the platform. It has to achieve  the best possible performances and enforcing the strongest possible level of isolation. L0 represents the last line of defense of the platform and a privileged point of global status observation.
 
 On the other hand, L1 is responsible for horizontal feature set. it has to provide the widest possible support to different platforms and the capacity to virtualize adopting different techniques ( para-virtualization, hardware-assisted, dynamic binary translation). According to these requirements, Williams et al. \cite{art:blan} propose a patched version of Xen, Xen Blanket, to accomplish a L1 virtualization layer, designed to run over different platforms. This concretely allows to run over different physical platform the same VM, and live-migrate it at the occurrence.
@@ -281,13 +232,13 @@ Finally, adopting a MH as L1 prevents to use inter-platform enhanced features. A
 Id & Functional design Principle & Class & GPH over GPH & MH over MH & MH over GPH & GPH over MH\\
 \midrule
 DP1 & User-Data privacy & Vertical & $\times$  & $\checkmark$ & $\times $ & $\checkmark$ \\
-      DP2 & Fail-Safe modular architecture & Vertical & $\times$  & $\checkmark$ & $\times$ & $\checkmark$ \\
-   DP3 & Small TCB & Vertical &  $\times$& $\checkmark$ & $\times$ & $\checkmark$ \\
-   DP4 & Inter-platform support & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
-   DP5 & 3rd part compatibility & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
-   NDP1 & Minimize code addition & - & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
+DP2 & Fail-Safe modular architecture & Vertical & $\times$  & $\checkmark$ & $\times$ & $\checkmark$ \\
+DP3 & Small TCB & Vertical &  $\times$& $\checkmark$ & $\times$ & $\checkmark$ \\
+DP4 & Inter-platform support & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
+DP5 & 3rd part compatibility & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
+NDP1 & Minimize code addition & - & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
 \bottomrule
-      \end{tabular}
+\end{tabular}
 \end{table*}
 
 In this configuration, the TCB is smaller than other architectures, due to the modular structure of micro-kernels., executed at L0. Leveraging as L1 a GPH, like Xen or KVM, provides to the user an environment apparently  identical to the one used in production today, satisfying DP5. The L1 GPH is normally integrated with modern cloud toolkits like OpenStack and will support 3rd part applications.
@@ -315,7 +266,6 @@ However, it has not be underestimated, however, that para-virtualization support
 To sum up,  the adoption of MH could  increase feature set introduced by nested virtualization adoption. The first impeding problem is the implementation of MH, able to propose to guest to virtualize with hardware assistance. In next section, we present an implementation of GPH over MH, that try to circumvent this limitation leveraging paravirtualization.
  \section{Implementation}
 In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA.
-
 
 \begin{itemize}[]
 \item \textbf{Inter-platform support} Executed as L1, Xen would virtualize its nested guest initially using PV delivering the compatibility layer.
@@ -364,10 +314,8 @@ In the previous sections we proposed a functional analysis of cloud architecture
 %After this initial study, the first step will be deploying a minimal nested architecture testing ``out-of-the-box'' features and limitations. The following part will concern the conception of patch and extensions in order to adapt the general design of MH to properly act as L0.
 %The final goal is to provide an architecture able to leverage nested virtualization cloud platforms improvements, having a smaller TCB and allowing customers to leverage flexible migrations and scheduling.
 
-
-%\section{Conclusion}
-%{\scriptsize
-%\bibliographystyle{abbrv}
-%\bibliography{biblio}
-%}
+{\scriptsize
+\bibliographystyle{abbrv}
+\bibliography{biblio}
+}
 \end{document}
