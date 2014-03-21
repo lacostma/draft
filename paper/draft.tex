@@ -56,6 +56,13 @@ Furthermore, our architecture mushrooms commodity and micro hypervisors to lever
 
 \noindent Distributed cloud computing is now becoming a reality. Modern cloud platforms are able to provide elastic use of resources, optimizing their allocation to meet user needs. However, currently deployed distributed cloud infrastructures present several limitations.
 
+This paper is organized as follows. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{sec:classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
+%Furthermore, in Section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles.
+In Section~\ref{sec:conclu}, we conclude the paper with future works and our vision of the SuperCloud.
+% in section in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section 8.
+
+\section{Challenges and Design Principles}
+
 First, deploying cloud applications able to transparently leverage resources of several heterogeneous platforms is still difficult. The concept of super-cloud~\cite{art:blan, xclo:blank} tries notably to overcome such issues. Multi-platform coordination is hard, primarily due to lock-in to different standards such as VM formats. Unfortunately, such lock-in is not only due to market strategic decisions, but also reflects heterogeneity of virtualization technologies. For example, each cloud provider may use different storage systems or different formats to store VMs images. Different hypervisors have nowadays a low degree of compatibility between them. This generally prevents leveraging some popular features like VM live migration between different platforms. Incompatibility is even greater if we consider that each platform may adopt several types of virtualization techniques. This situation induces a tight dependency between the customer and the cloud provider. It may prevent guaranteeing service availability by relying on alternative providers, or to set up geographical optimizations due to cost or origin of traffic. This has resulted in some dramatic data server failures in recent years, causing prolonged outage of service for many applications. In what follows, we refer to this class of multi-platform issues as \textit{horizontal} challenges.
 
 Second, a number of issues have been raised about user data privacy and platform integrity. From the user perspective, users would like to preserve privacy of their data stored on the cloud platform. However, due to overprivileged hypervisors, a curious or malicious administrator could easily retrieve such data~\cite{cloudvisor:zhang}. In a multi-tenant cloud platform, physical resource sharing between users may lead not only to data leakage or but also attacks against the IaaS~\cite{bot:att, sec:you}.
@@ -63,40 +70,35 @@ From the provider perspective, a key objective is to thus guarantee platform int
 %: the platform administrator cannot perform in-depth infrastructure monitoring nor can users concretely inspect administrator actions on their data. 
 A major challenge for new generations of cloud infrastructures is thus to find acceptable trade-offs between such conflicting requirements. In what follows, we refer to this class of layer-oriented issues as \textit{vertical} challenges.
 
-We identified five key design principles that a IaaS architecture should implement to meet the previous challenges. In what follows, those principles will serve as reading template to analyze different architectures.
+We identified five key design principles (DP) that a IaaS architecture should implement to meet the previous challenges. In what follows, those principles will serve as reading template to analyze different architectures.
 \begin{itemize}[]
-\item \textbf{DP1 User-Data Privacy} A curious or malicious administrator (or another platform user) should not be authorized to inspect and analyze user data and VM instances without explicit user consent relying on mutually trusted services. A trade-off should be found to allow providers to detect and react to potential threats, but also to prevent unlimited platform and user data access in such inappropriate operator behaviors. Thus, a platform administrator should not manage the infrastructure directly using the highest level of privilege. Instead, his actions on user data objects should be validated by a mutually-trusted kernel run in the most privileged mode. This kernel should also enforce memory page encryption to prevent snooping when pages are swapped out.
-\item \textbf{DP2 Fail-Safe Modular Architecture} In order to recover soft failures, the archtecure is supposed to be fail-safe, being able of automatically migrate instances or user-data in presence of a menace, but also reactivating the correct functioning in presence of a software failure. In order to satisfy this property, the amount of safety-critical components has to be as lowest as possible and the overall design has to be kept as modular as possible.
-\item \textbf{DP3 Small TCB} The amount of lines of code executed at the highest level of privilege is normally proportional to the number of potential failures and bugs in the platform. According to this, an architecture presenting a tiny TCB will improve its safety and integrity properties by design.
-\item \textbf{DP4 Inter-Platform Support} The cloud architecture has to be designed in order to support directly different platforms and service providers. The same user virtual instances have to be executed (and potentially migrated) unmodified over different platforms.
-\item \textbf{DP5 Compatibility with Legacy} Avoid disruption of existing 3rd part applications compatibility could represent a major principle to consider. Platform interfaces has to be kept as close as possible to the existing one, preventing application rewrite.
+\item \textbf{DP1 User Data Privacy} A curious or malicious administrator (or another platform user) should not be authorized to inspect and analyze user data and VM instances without explicit user consent relying on mutually trusted services. A trade-off should be found to allow providers to detect and react to potential threats, but also to prevent unlimited platform and user data access in such inappropriate operator behaviors. Thus, a platform administrator should not manage the infrastructure directly using the highest level of privilege. Instead, his actions on user data objects should be validated by a mutually-trusted kernel run in the most privileged mode. This kernel should also enforce memory page encryption to prevent snooping when pages are swapped out.
+\item \textbf{DP2 Fail-Safe Modular Architecture} The architecture should be fail-safe: for instance, to enable automatically migration of instances or user-data in presence of a threat and to recover from software failures. To reach this goal, the amount of safety-critical components should be as low as possible to mimize the attack surface. Similarly, the overall design should be as modular as possible to enable platform reconfiguration.
+\item \textbf{DP3 Small TCB} The number of potential failures and bugs in the platform is directly linked with the code size executed at the highest level of privilege. Thus, an architecture with a tiny TCB (Trusted Computing Base) will improve safety and integrity by design.
+\item \textbf{DP4 Inter-Platform Support} The cloud architecture should allow supporting directly different platforms and service providers. The same user virtual instances should be allowed to be run (and potentially migrated) unmodified over different IaaS platforms.
+\item \textbf{DP5 Compatibility with Legacy} Evolution in the IaaS architecture should avoiding disrupting existing third party applications. Thus, platform interfaces should be kept as close as possible to existing ones, to prevent code rewriting notably for applications.
 \end{itemize}
-Moreover, beside this functional design principles specifying which features have to be achieved by the platform, another set of non-design principles could be identified. Those principles does not concern directly features or aspects of the architecture of the platform, but the effective feasibility of the architecture. 
+In addition to the above functional design principles that specify which features have to be achieved by the platform architecture, another set of non-design principles (NDP) should be considered regarding effective feasibility of implementing the architecture. We just give an example in terms of platform usability:
 \begin{itemize}[]
-\item \textbf{NDP1 Minimize code addition} a major issue could be represented by the amount of code lines that have to be added and maintained to an existing architecture to meet the functional requirement. Even it does not represent strictly a technical limitation to a certain proposal, it could become a ``show-stopper'' factor for its utilization.
+\item \textbf{NDP1 Minimal Additional Code} A major issue could be represented by the amount of code to be added and maintained to an existing architecture to meet functional requirements. Despite not being a strictly a technical limitation of the architecture, it could become a show-stopper to its practical use.
 \end{itemize}
-In our analysis, it will be kept in consideration not only the overall suitability of the architecture, but also a quantification of the effort needed to develop and deploy it. In table \ref{int:des} it is possible to observe a resume of previous cited principles.
+In our analysis, we will consider not only the overall suitability of the architecture, but also the amount of effort needed to develop and deploy it. Table \ref{int:des} summarizes the previous principles and which class of requirements they address.
  
 \begin{table}
-\label{int:des}
-\begin{tabular}{llll}
+\caption{Design Principles for a Distributed IaaS Platform.\label{int:des}}
+\begin{tabular}{lll}
 \toprule
-Id & Functional design Principle & Class &\\
+\textbf{Id} & \textbf{Design Principle} & \textbf{Class of Requirement} \\
 \midrule
-DP1 & User-Data privacy & Vertical & \\
-DP2 & Fail-Safe modular architecture & Vertical & \\ 
-DP3 & Small TCB & Vertical & \\
-DP4 & Inter-platform support & Horizontal & \\
-DP5 & Backwards 3rd part compatibility & Horizontal \\
-NDP1 & Minimize code addition & & \\
+DP1 & User Data Privacy & Vertical \\
+DP2 & Fail-Safe Modular Architecture & Vertical \\ 
+DP3 & Small TCB & Vertical \\
+DP4 & Inter-Platform Support & Horizontal \\
+DP5 & Compatibility with Legacy & Horizontal \\
+NDP1 & Minimal Additional Code & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-This paper is organized as following. In Section~\ref{sec:rw} we analyze the nested virtualization ecosystem and position existing solutions regarding our design principles. In Section~\ref{sec:classic}, we details limitations of classical nested virtualization approach and in Section~\ref{sec:mh} we present the microvisor approach. In Section~\ref{sec:archcomp} we compare cloud architectures propositions, combining nested virtualization and microvisors, leveraging the design principles grid introduced before.
-%Furthermore, in Section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles.
-In Section~\ref{sec:conclu}, we conclude the paper with future works and our vision of the SuperCloud.
-% in section in section 6 we define a security architecture for multi-cloud scenario, with an analysis of necessary software components to satisfy vertical design principles. In section 8, we conclude the paper with future works in section 8.
  
 \section{Related Work}
 \label{sec:rw}
