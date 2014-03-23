@@ -136,24 +136,25 @@ L0 tackles vertical aspects of the platform. It aims to guarantee the best perfo
 
 L1 is responsible for horizontal feature set. It has to provide the widest possible support for different platforms and the ability to virtualize using different techniques e.g., para-virtualization, hardware-assisted virtualization, dynamic binary translation. {\sffamily To address such requirements, Williams et al.~\cite{art:blan} proposed a patched version of Xen, Xen Blanket, to realize an L1 virtualization layer designed to run over different hypervisors. This notably enables to run and to perform live migration of the same VM over different physical cloud infrastructures.} % A migrer dans le related work?
 
-\subsection{Limits}
+\subsection{Limitations}
 
-Nowadays, nested virtualization presents several limits related to the hardware support and software state of implementation. At first, to provide nested virtualization, hypervisors has to provide an exact copy of hardware virtualization facilities. The most exploited technique, full virtualization with hardware assistance (HV), relies on a quite complex dedicated support.
-This set of facilities assists instruction emulation, memory address translation and device management. Both Xen and KVM propose nested VMX/SVN features, that consists in the possibility to efficiently handle nested hardware virtualization, in presence of a single-layer hardware facilities.
-Full Virtualization is currently the only virtualization technique supported for L1 virtualization, due to its capacity of running unmodified guest OS and therefore hypervisors. On the contrary, PV would require an ad hoc modified hypervisor to act as L1 (not satisfying NDP1).
+\noindent Today, NV presents several limitations related to hardware support {\sffamily and software state of implementation}. 
+
+First, to support NV, the hypervisor has to provide an exact copy of hardware virtualization primitives. Full virtualization with hardware assistance (HAV) is the most popular technique, but requires quite a complex dedicated support.
+HAV primitives assist instruction emulation, memory address translation, and management of devices. Both Xen and KVM propose {\sffamily nested VMX/SVN features} that allow to efficiently handle nested hardware virtualization on single-layer hardware primitives.
+Full virtualization is currently the only virtualization technique supported for L1 virtualization due to its ability to run unmodified guest OSes -- and thus hypervisors. Paravirtualization (PV) would on the contrary require an ad hoc modified hypervisor to act as L1 (thus violating the NDP1 principle).
 %To address this performance problems, several hardware producers proposed new facilities, like Intel VMCS shadowing, that reduces the amount of nested VMEXIT when handling a nested guest VMEXIT.
-Although nested virtualization performance are still not good and the feature is not yet stable on modern hypervisor \cite{xen:test}, the feature is under heavy development and it will be hopefully in a usable state soon.
+Despite still poor NV performance and not being yet stable on modern hypervisors~\cite{xen:test}, such feature is under heavy development and will hopefully be in a usable state soon.
 
-Secondly, due to the monolithic architecture, each feature introduced in GPH enlarges the TCB. Therefore, leveraging GPH, a huge amount of code is running in the most privileged mode and has to be trust. Several works discuss and analyze the overall TCB of modern GPH \cite{nova, xmhf}, considering GPH TCB always bigger than 100 KLoC. This approach directly collides with one design principles introduced in the introduction paragraph (DP3), 
+Second, due to current monolithic GPH architectures, each feature directly introduced within the hypervisor such as security enhancements enlarges the TCB~\cite{cloudvisor:zhang}. Therefore, a huge amount of code runs in highly privileged mode and must be trusted. Several works discuss and analyze the overall TCB of modern GPHs, always bigger than 100 KLoC~\cite{nova, xmhf}. This approach directly violates the DP3 design principle.
 %that identified a small TCB as a major requirement for a solid architecture.
 %A brief comparison of TCB of widespread GPH is depicted in figure \ref{fig:tcbchart}. 
 %More importanly, this is particularly true looking at the monolithic approach of commercial hyper-visors, where any addition to the hypervisor body enlarges the TCB.
+Moreover, the previous architecture does not improve overall stability of the infrastructure. The bottom-most hypervisor L0 faces the same issues as single-layer GPH architectures: a large TCB implies also that a failure experienced in one of its critical components may trigger a generalized failure of the whole platform (violating the DP2 principle). Besides, in standard GPH architectures, the administrator has the entire control of the platform and could potentially snoop and inspect user VM status and data (violating the DP1 principle).
+Such designs notably do not take advantage of the possibility {\sffamily to use a platform compatibility layer}, and more modular architectures with only a tiny security-critical kernel.
 
-Finally, the above architecture does not improve the overall stability of the infrastructure. The underlying core, L0, has the same problem of single-layer GPH architecture: the large TCB implies also that a failure experienced in one of the critical components will simply produce a generalized failure of the whole platform, not satisfying DP2. Moreover, in GPH standard architecture, the administrator has the entire control of the platform and could potentially snoop and inspect user VM status and data.
-
-This kind of architecture, in particular, does not leverage completely the possibility to hide behind a compatible layer, a really modular architecture with only a tiny critical core.
-To sum up, current nested virtualization limits are represented by a certain lack of dedicated feature in modern hypervisor and the impossibility to rely on a tiny TCB (DP3, DP4).
-The first one is being addressed by hypervisor developers. The second one could simply not be achieved with modern hypervisors. 
+Overall, current NV architectures lack some of the dedicated features found in modern hypervisors and the impossibility to rely on a tiny TCB (violating principles DP3 and DP4).
+If the first one is currently being addressed by hypervisor developers, the second simply has not be achieved with modern hypervisors so far.
 
 \section{Micro-hypervisors}
 \label{sec:mh}
