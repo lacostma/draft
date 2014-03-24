@@ -46,10 +46,65 @@ Marc Lacoste\\
 %Nested virtualization is a technique capable to diversify hypervisor features. Exploiting an extra layer of virtualization, we will be able to decouple different requirements, avoiding the need to find delicate trade-off.
 %
 %In this paper, we will analyze the state of nested virtualization in modern hypervisor and evaulating the impact of utilization of microhypervisor to enforce a stronger security level.
-The problem of homogeneity over multiple IaaS providers is receiving considerable attention with the evolution toward nested virtualization. These new architectures unveil user-centric opportunities such as efficient resources management and VM migration. However the inherent drawbacks hinder its global adoption with a larger TCB and the complexity to monitor another virtualization layer. Thus, we argue that the promising architectural view of micro hypervisors approach is the key to the separation of hypervisor duties and reducing the attack surface.
+%The problem of homogeneity over multiple IaaS providers is receiving considerable attention with the evolution toward nested virtualization. These new architectures unveil user-centric opportunities such as efficient resources management and VM migration. However the inherent drawbacks hinder its global adoption with a larger TCB and the complexity to monitor another virtualization layer. Thus, we argue that the promising architectural view of micro hypervisors approach is the key to the separation of hypervisor duties and reducing the attack surface.
+%
+%Furthermore, our architecture mushrooms commodity and micro hypervisors to leverage nested virtualization in terms of user-data privacy, modularity, TCB size and compatibility. These design principles are evaluated for each architecture configuration and compared to establish a reference security architecture. The resulting combination is built over common hypervisors empowered with micro hypervisors features. A reference implementation proven the architecture to be viable and will be extended to meet broader hypervisor scopes, enabling migration over heterogeneous cloud servers.
+Distributed cloud computing is now moving user-centric. The pro-mise of this evolution is: (1) unified resource management across IaaS providers, e.g., live migration independent from hypervisor technology; (2) increased customizability to choose the hypervisor services needed to realize fully à la carte, self-service clouds. However, a reality check shows that major interoperability and security barriers must be lifted, and complex trade-offs be found between functionalities provided and security assurance.
+Nested virtualization (NV) brings both a homogeneous interface for distributed hypervisor features and enhanced IaaS security, protecting VMs even in case of hypervisor compromise. However, practical NV adoption is still hindered by code additions to an already very large hypervisor TCB and by limited hardware support. New distributed IaaS architectures are therefore required.\\
 
-Furthermore, our architecture mushrooms commodity and micro hypervisors to leverage nested virtualization in terms of user-data privacy, modularity, TCB size and compatibility. These design principles are evaluated for each architecture configuration and compared to establish a reference security architecture. The resulting combination is built over common hypervisors empowered with micro hypervisors features. A reference implementation proven the architecture to be viable and will be extended to meet broader hypervisor scopes, enabling migration over heterogeneous cloud servers.
+In this paper, we argue that micro-hypervisor (MH) architectures are the key to overcome such NV limitations. 
+From the previous challenges, we derive a set of design principles that a distributed IaaS architecture should satisfy. 
+We compare possible architectural designs combining NV with micro-hypervisor features to find the best trade-off between user data privacy, modularity, TCB size, and compatibility with multiple platforms. 
+We sketch how the resulting architecture may serve as a basis for 2D security management of a cloud of clouds: vertically, across layers for hardened IaaS security, and horizontally spanning cloud domains for end-to-end security.
 }
+
+%The first challenge means that threats will be both vertical, spanning layers, and horizontal, spanning domains  the SUPERCLOUD being a multi-layer, multi-domain distributed cloud infrastructure. Vertically, attacks currently target several infrastructure layers (e.g., VMs, hypervisor). Unfortunately, most existing defenses are generally for single layers only. This makes it difficult to grasp the overall extent of an attack. Horizontally, threats may propagate through the network from cloud to cloud. Unfortunately, most existing defenses are for single clouds only. Lack of interoperability in security policies and mechanisms is thus a major barrier to  unified hybrid cloud security. The second challenge means that although many defense mechanisms may be leveraged in this 2D landscape, they remain difficult to configure and to reconcile. The current “by hand” approach becomes a nightmare for security administrators. Despite some automated solutions for managing security of single clouds, there is currently no solution truly applicable to federations of clouds in practice.
+
+
+
+%The resulting combination is built over common hypervisors empowered with micro hypervisors features. 
+%
+%rchitecture mushrooms commodity and micro hypervisors to leverage nested virtualization
+%
+%
+%
+%Furthermore, our architecture mushrooms commodity and micro hypervisors to leverage nested virtualization in terms of user-data privacy, modularity, TCB size and compatibility. These design principles are evaluated for each architecture configuration and compared to establish a reference security architecture. 
+%
+%enhance NV architecture next generation of distributed clouds security and interoperabiltiyi issues.
+%
+%
+%failureverall, current NV architectures lack some of the dedicated features found in modern hypervisors and the impossibility to rely on a tiny TCB (violating principles DP3 and DP4).
+%If the first one is currently being addressed by hypervisor developers, the second simply has not be achieved with modern hypervisors so far.
+%
+%ypervisors have to find a complex trade-off between functionalities provided and security assurance. Those requirements are contrasting by design:
+%%adding new features will generally increases the LoC and consequently the attack surface. On the contrary, those code additions are required to properly fulfill market requests. 
+%
+%the inherent drawbacks hinder its global adoption with a larger TCB and the complexity to monitor another virtualization layer.
+%
+%First, independence from the provider resulting in lower infrastructure operation overheads, more rapid deployment of services, but also increased homogeneity the customer being free a particular hypervisor technology. Second, increased customizability, as the customer can choose which virtualized services (e.g., for security) may be deployed resulting in fully a la carte clouds. Third, new business opportunities, as SCs and their (virtual) apps might become new markets in the manner of ecosystems from the mobile computing world (e.g., iPhone, Android). 
+%
+%User-centric: de DCC
+%vers plus d'homogeneity
+%problemes 
+%verticaux
+%horizontaux.
+%
+%NV: solutions pour résoudre certains de ces problèmes.
+%
+%VErticaux: ...
+%Horizontaux: ...
+%
+%Mais limites ... + ...
+%New architectural solutions must be found.
+%
+%In this paper explore potential of micro-hypervisor architectures to enhance NV architecture next generation of distributed clouds security and interoperabiltiyi issues.
+%
+%We explore design principles properties.
+%
+%We compare architecutral solutions combining NV+MH to find the best trade off between ..., ???; ... meilleure approche.
+%
+%We sketch finally: how this type of architecture could enable to perform 2D supervision xl alyer x domain.
+
 
 \section{Introduction}
 \label{sec:intro}
@@ -174,7 +229,7 @@ Such designs notably do not take advantage of the possibility {\sffamily to use 
 Overall, current NV architectures lack some of the dedicated features found in modern hypervisors and the impossibility to rely on a tiny TCB (violating principles DP3 and DP4).
 If the first one is currently being addressed by hypervisor developers, the second simply has not be achieved with modern hypervisors so far.
 
-\section{Micro-hypervisors}
+\section{Micro-Hypervisors}
 \label{sec:mh}
 
 %\begin{figure}
@@ -186,10 +241,21 @@ If the first one is currently being addressed by hypervisor developers, the seco
 %\end{figure}
 
 % Xen and KVM TCB
-Consequentially, several works focused this problem leveraging a micro-hypervisor architecture, with a traditional microkernel-like design that tries to consistently reduce the amount of code running with the highest privilege level. A micro-kernel traditionally consists in a tiny core running in Kernel Mode, offering only few fundamental services to other modules running (scheduling, IPC, memory management) in a less privileged domain. All other components, in particular device drivers, are moved out in user-space.
-Microkernels had been questioned because of the wasteful performance of first generations, due to IPC intrinsic cost. This argument had been completed confuted by Liedtke in 1993: \cite{liedtke1993ImpIPCbyKerDes,liedtke1995micCon}.
 
-Microkernels have the capacity of easily redesign the hierarchy of privileges. A user application has normally to trust the tiny micro-kernel and only the set of user-space software it uses. However, this set of trusted set of drivers and tools have not to be trusted by every application executed in the system. Normally, this allows microkernels to implement different ``personalities''. User applications shares the system but could have to deal with completely different system services in a transparent way. However, ``personalities'' interest had been hugely reduced by the fact that system services, device drivers and even application had to be completely re-conceived to fit this new design pattern. Therefore, with the introduction of VMs, microkernels lost the battle in favor of hypervisors, in terms of popularity. However, the great advantage of tiny TCB, provided by microkernel, was not provided also by hypervisors. As we analyzed before, they present normally a monolithic architecture, like the great part of modern OS. This feature kept alive the interest in microkernels, in particular trying to couple microkernel benefits with virtualization.
+\subsection{Principle}
+
+\noindent To solve the TCB size issue, several works have introduced the idea of \textit{micro-hypervisor (MH)} architecture~\cite{nova, NoHype, xmhf}. To reduce the hypervisor size, such new hypervisor architectures draw inspiration from evolution in OS architecture (e.g., extensible, micro-, exo-, component-based kernels). Within the hypervisor are distinguished security-critical modules from non-sensitive code. The aim is to expel as much code as possible from the TCB and target ultra-thin hypervisors. For instance, some components of the hypervisor (e.g., device drivers, VM address space management) may be virtualized outside the micro-hypervisor, isolated, and restarted in case of compromise~\cite{nova}. The extreme case is to remove the virtualization layer altogether~\cite{NoHype}.
+
+with a traditional microkernel-like design that tries to consistently reduce the amount of code running with the highest privilege level. 
+
+A micro-kernel traditionally consists in a minimal kernel running in privileged mode, offering only a few fundamental services to other modules (e.g, scheduling, IPC, memory management) running in a less privileged domain. All other components, such as device drivers, are moved out in user-space. While the benefits of such a design has been questioned due to the cost of IPCs in first generations of micro-kernels, such arguments have since then been completely dispelled~\cite{liedtke1993ImpIPCbyKerDes,liedtke1995micConnova}.
+%Microkernels had been questioned because of the wasteful performance of first generations, due to IPC intrinsic cost. This argument had been completed confuted by Liedtke in 1993: \cite{liedtke1993ImpIPCbyKerDes,liedtke1995micCon}.
+
+%Architectural solutions were also created to make the hypervisor more minimal and flexible, targetting its two most vulnerable elements: (1) the core hypervisor itself; and (2) the management VM (e.g., Xen Dom0).
+%
+%A first class of solutions aims \textit{to reduce the hypervisor size}. The new hypervisor architecture should be more minimal, drawing inspiration from evolution in OS architecture (e.g., extensible, micro-, exo-, component-based kernels). Within the hypervisor are distinghuished security-critical modules from non-sensitive code. The aim is to expel as much code as possible from the TCB and target ultra-thin hypervisors, also known as \textit{micro-hypervisors}. For instance, some components of the hypervisor (e.g., device drivers, VM address space management) may be virtualized outside the micro-hypervisor, isolated, and restarted in case of compromise~\cite{NOVA}. The extreme case is to remove the virtualization layer altogether~\cite{NoHype}.
+%Unfortunately, although promising, such architectures usually require extensive code rewriting. They also provide a very limited number of resource management services unlike an operational IaaS infrastructure. They are thus hard to apply to mainstream hypervisors today.
+One of the benefits of micro-kernels is to enable to easily redesign a hierarchy of privileges. A user application normally trusts the micro-kernel and only the set of user-space services it requires. However, such drivers and libraries may not be trusted by every application run on the system. User applications share the system but may need to support completely different set of system services. This allows micro-kernels to implement different ``personalities''. However, the interest of such ``personalities'' has been largely reduced by the fact that system services, device drivers and even applications have to be completely re-designed to fit this new architectural pattern. Therefore, with the introduction of VMs, microkernels lost the battle in favor of hypervisors, in terms of popularity. However, the great advantage of tiny TCB, provided by microkernel, was not provided also by hypervisors. As we analyzed before, they present normally a monolithic architecture, like the great part of modern OS. This feature kept alive the interest in microkernels, in particular trying to couple microkernel benefits with virtualization\cite{Heiser}.
 
 Therefore, leveraging this concept of microkernels, a micro hypervisor (MH) is composed from a small kernel providing only essential functions, like scheduling, IPC, memory management and VMX extension. Several micro-hypervisor have been proposed in literature \cite{xmhf, nova}. They rely on the micro-kernel paradigm, extending it to virtualization. MH naturally satisfy vertical design principles (DP1,DP3, DP4). The tiny core could be considered the only system-critical componente of the architecture and, due to its relative small dimension and the consequent minor attitude to vulnerabilities,it could represent the ``last line of defense''.
 
@@ -197,7 +263,7 @@ In addition, MH inherits the concept of micro-kernel to implement different ``pe
 Finally, this extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity.  A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
 In addition, this approach is not far from the one proposed in DeHype \cite{wu2013TamHosHypMosDepExe}, where a consistent part of the KVM hypervisor has been demoted in user-space.
 
-\subsection {MH General Issues}
+\subsection {Limitations}
 
 Despite the positives, MH approaches had demonstrated some limitations. Firstly, the straightforward one is the initial lack of hardware support, lack of device drivers are still a relevant Achilles' heel for this solutions, inherited from its ancestors microkernels. Fortunately, this kind of issue could be addressed leveraging I/O passthrough techniques, although it will cause exclusive allocation issues.
 
