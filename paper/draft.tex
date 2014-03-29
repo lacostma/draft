@@ -13,6 +13,7 @@
 \usepackage{amsfonts}
 \usepackage{fancyhdr}
 \usepackage{times}
+\usepackage{url}
 %\pagestyle{fancy} % options: empty , plain , fancy
 %\renewcommand{\headrulewidth}{0pt} % customise the layout...
 %\lhead{}\chead{}\rhead{}
@@ -177,20 +178,16 @@ NDP1 & Minimal Additional Code & -- \\
 \label{sec:rw}
 
 % Intro + performance issues
-Several works presented in literature integrates these a subset of this design principles in their architecture, leveraging nested virtualization \cite{turtle:ibm,art:blan, cloudvisor:zhang}
-Cloud computing feature set could be enlarged exploiting two layers of virtualization instead of just one. The presence of two different hypervisors allows the possibility to specialize hypervisors functions. Instead of having a general purpose hypervisor we could split the hypervisor role in two different layers, interconnected with a well defined interface.
-Each layer will have to care about a subset of features, simplifying overall development.
-However, nested virtualization on x86 architecture faced impeding performance issues \cite{rec:virt}.
-
+\noindent A growing body of research has investigated building architectures and infrastructures integrating a subset of those design principles leveraging nested virtualization (NV)~\cite{turtle:ibm,art:blan, cloudvisor:zhang, Inception, hvx:usenix}. The distributed cloud feature set may be expanded using two levels of virtualization instead of a single one. This design allows to specialize hypervisor functions per layer, each layer addressing a subset of features, simplifying overall development compared to a general-purpose hypervisor. However, NV development on x86 architecture was initially hindered by severe performance issues~\cite{rec:virt}.
 % Perfomance issuess adressed
-However, several works demonstrate that it is possible to put in place low overhead nested virtualization using special approaches \cite{turtle:ibm} . Moreover, other works try to recover performance loss exploiting multi-level consolidation, introduced in nested virtualization \cite{art:blan}. In conclusion, nested virtualization slowdown could be considered nowadays an acceptable price to achieve advanced features and, in addition, hardware manifacturers are developing and proposing new hardware facilities to reduce this overhead \cite{vmcs:nakajima}.
+However, several works have shown it possible to realize low-overhead NV using dedicated implementation architecture~\cite{turtle:ibm}, or to recover performance loss exploiting multi-level consolidation~\cite{art:blan}. NV slowdown can now be considered an acceptable price to achieve advanced features -- hardware manufacturers are also developing new hardware primitives to reduce this overhead~\cite{vmcs:nakajima}.
 
-To sum up, no architecture had been presented to address vertical and horizontal class of problems at the same time until now. XenBlanket does not investigate cloud architectural security concerns (DP3,DP2), limiting the focus on new potential feature of a coordinated multi-provider cloud. Cloudvisor proposed a security architecture that leverages nested virtualization without allowing the possibility of executing more than one nested hypervisor at time, that is a crucial requirements of a multi-provider cloud platform (DP4). In a SuperCloud scenario, each user has to run its own L1 hypervisor instance to enforce a compatibility layer, overcoming incompatibilities between different providers.
+However, so far no architecture has currently addresses both vertical and horizontal set of challenges simultaneously. XenBlanket~\cite{art:blan} does not investigate cloud architectural security concerns (DP2, DP3), limiting its focus to providing new features on a coordinated multi-provider cloud. Cloudvisor~\cite{cloudvisor:zhang} proposed a NV-based security architecture, but cannot run more than one nested hypervisor at time, which is a criticial requirement for multi-provider cloud platform (DP4). In the super-cloud vision~\cite{xclo:blank}, each user runs its own L1 hypervisor instance to realize  a blanket layer overcoming incompatibilities between different providers. However, security issues have not been addressed.
 
-Other approaches leveraging only one layer of virtualization does not achieve the whole design-principle satisfaction. Self-service cloud approach (SSC) \cite{ssc:art} design a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures, in order to alleviate the different needing user-centric and provider-centric vision of cloud computing presented in \ref{sec:intro}. Even if this architecture reproduces an approach similar to the SuperCloud without leveraging an extra layer of virtualization (DP4), the approach changes the behavior where the user acts introducing new components that have to be directly managed by the user. Therefore, the main drawback of this solution is to change the interface with the user, preventing the possibility to straightforwardly move to the new platform without having to change its applications (DP5).
+Other approaches based on a single layer of virtualization do not fulfill all principles either. Self-Service Clouds (SSC)~\cite{ssc:art} introduces a complete security architecture to overcome major security and privacy issues of currently deployed cloud infrastructures. The aim is to reconcile user-centric and provider-centric requirements of the cloud. Despite being similar to the super-cloud approach (DP4), SSCs introduces new components that have to be directly managed by the user. This change of interface with user VMs prevents moving straightforwardly to the new platform without having to change its  applications (DP5).
 
 % Integration NDSS Taming
-Furthermore, DeHype \cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM hypervisor, trying to reduce the TCB of this popular hypervisor. The approach consisted in demoting a great part of the hypervisor codebase to a user-level execution. DeHype satisfies all vertical design principles listed before (DS1,DS2,DS3), reinterpreting the microkernel approach defining  the greatest part of code to userspace. DeHype increases a lot the robustness of a cloud platform leveraging KVM, limiting for example the possibility of attack in multi-tenancy platform, but it does not address horizontal design principles about a multi-provider service.
+To reduce the TCB size, DeHype~\cite{wu2013TamHosHypMosDepExe} presented a dissected version of KVM, moving a great part of the code to user space. DeHype satisfies all vertical design principles, re-interpreting the microkernel approach in a KVM setting. It increases a lot the robustness and security of a cloud platform leveraging KVM (DP1), but does not address horizontal challenges for a multi-provider service.
 
 \section{Current Nested Virtualization}
 \label{sec:classic}
@@ -244,32 +241,100 @@ If the first one is currently being addressed by hypervisor developers, the seco
 
 \subsection{Principle}
 
-\noindent To solve the TCB size issue, several works have introduced the idea of \textit{micro-hypervisor (MH)} architecture~\cite{nova, NoHype, xmhf}. To reduce the hypervisor size, such new hypervisor architectures draw inspiration from evolution in OS architecture (e.g., extensible, micro-, exo-, component-based kernels). Within the hypervisor are distinguished security-critical modules from non-sensitive code. The aim is to expel as much code as possible from the TCB and target ultra-thin hypervisors. For instance, some components of the hypervisor (e.g., device drivers, VM address space management) may be virtualized outside the micro-hypervisor, isolated, and restarted in case of compromise~\cite{nova}. The extreme case is to remove the virtualization layer altogether~\cite{NoHype}.
+\noindent To solve the TCB size issue, the idea of \textit{micro-hypervisor (MH)} architecture was introduced~\cite{nova, NoHype, xmhf, mccune2010TruEffTCBRedAtt}. Such hypervisor design draws inspiration from evolution in OS architecture (e.g., extensible, micro-, exo-, component-based kernels). Within the hypervisor are distinguished security-critical modules from non-sensitive code. The aim is to expel as much code as possible from the TCB make the hypervisor ultra-thin. Some hypervisor components (e.g., device drivers, VM address space management) may be virtualized outside the MH, isolated, and restarted in case of compromise~\cite{nova}. The utmost MH removes the virtualization layer altogether~\cite{NoHype}.
 
-with a traditional microkernel-like design that tries to consistently reduce the amount of code running with the highest privilege level. 
 
-A micro-kernel traditionally consists in a minimal kernel running in privileged mode, offering only a few fundamental services to other modules (e.g, scheduling, IPC, memory management) running in a less privileged domain. All other components, such as device drivers, are moved out in user-space. While the benefits of such a design has been questioned due to the cost of IPCs in first generations of micro-kernels, such arguments have since then been completely dispelled~\cite{liedtke1993ImpIPCbyKerDes,liedtke1995micConnova}.
+%MH = MK+ H.
+MH architectures may be seen as convergence of traditional hypervisor and micro-kernels (MK).
+%1) MK
+%Perspective: minimalisme: 
+%with a traditional microkernel-like design that tries to consistently reduce the amount of code running with the highest privilege level.
+From the MK design principles legacy, the MH is guided by TCB minimization. 
+%-- Définition du mk
+%A micro-kernel traditionally consists in a minimal kernel running in privileged mode, offering only a few fundamental services to other modules (e.g, scheduling, IPC, memory management) running in a less privileged domain. All other components, such as device drivers, are moved out in user-space.
+%-- Définition du mh:
+%Therefore, leveraging this concept of microkernels, a micro hypervisor (MH) is composed from a small kernel providing only essential functions, like scheduling, IPC, memory management and VMX extension. 
+Thus, it features a minimal kernel running in privileged mode, offering only a few fundamental services (e.g, scheduling, IPCs, memory management, VMX extensions) to other modules running in less privileged domains. All other components, such as device drivers, are moved out in user-space. 
+% Skip inconvénients du MK
+%1) Inconvénients du mk: performance.
 %Microkernels had been questioned because of the wasteful performance of first generations, due to IPC intrinsic cost. This argument had been completed confuted by Liedtke in 1993: \cite{liedtke1993ImpIPCbyKerDes,liedtke1995micCon}.
+%While the benefits of such a design has been questioned due to the cost of IPCs in first generations of micro-kernels, such arguments have since then been completely dispelled~\cite{liedtke1993ImpIPCbyKerDes,liedtke1995micConnova}.
+%-- Bénéfices du mk
+The main benefit of such increased modularity is
+% a) Bénéfices du mk: flexibility in privilege
+% One of the benefits of micro-kernels is to enable to easily redesign a hierarchy of privileges. 
+%
+%The different groups may hold correspond to different trust relationships of principals running Control is finer than in the hypervisor, both by the granularity of isolation (lightweight threads), and by a unique control point of RT behavior in the scheduler. Device drivers are run in , allowing great flexibility for device sharing patterns.
+to easily define groups of user-space services, each group sharing a common a set of privileges. Trust relationships between groups may be arbitrarily defined, mirroring those between sets of principals or applications sharing the system. 
+%For instance, a user application normally trusts the micro-kernel and only the set of user-space services it requires. However, such drivers and libraries may not be trusted by every application run on the system. User applications share the system but may need to support completely different set of system services. 
+% -- Les personalités:
+% In addition, MH inherits the concept of micro-kernel to implement different ``personalities''. 
+This allows MK to implement different ``personalities'': device drivers being run in user mode, such fine-grained control allows great flexibility to implement device sharing patterns.
+%
+%2) H
+%
+%Plus facile dans un contexte d'hyperviseurs:
+%However, the interest of such ``personalities'' has been largely reduced by the fact that system services, device drivers and even applications have to be completely re-designed to fit this new architectural pattern. 
+%
+%Therefore, with the introduction of VMs, microkernels lost the battle in favor of hypervisors, in terms of popularity.
+While the interest of realizing such ``personalities'' in traditional MKs somewhat lessened as system services, drivers, and even applications had to be completely re-designed (hypervisors offering better primitives for abstraction with the notion of VM), 
+%
+%
+%3) MH.
+%
+such flexibility still remains a major benefit of coupling micro-kernel design with virtualization~\cite{OKL4}.
 
+%1) Pas de tiny TCB
+%However, the great advantage of tiny TCB, provided by microkernel, was not provided also by hypervisors. 
+%2) Architecture monilithic
+%As we analyzed before, they present normally a monolithic architecture, like the great part of modern OS. 
+%This feature kept alive the interest in microkernels, in particular trying to couple microkernel benefits with virtualization
+
+%-- Exemples: Several micro-hypervisor have been proposed in literature \cite{xmhf, nova}. 
+%
+%=> -- MH = MK+ virtualization. They rely on the micro-kernel paradigm, extending it to virtualization. MV
+
+%-- Relation entre MH et principes: 
+%* MH naturally satisfy vertical design principles (DP1,DP3, DP4). 
+MHs are particularly well adapted to sastisfy vertical design principles.
+% Security:
+%Pourquoi: 
+For instance, MH design increases reliability as services crashing in user space may be restarted without bringing down the entire system (DP2).
+%Fail-safe principle:
+%Moving Finally, this extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity. 
+The attack surface is also lowered by the small TCB size, the minimal kernel only containing security-critical components and forming a last line of defense (DP3).
+%The tiny core could be considered the only system-critical componente of the architecture and, due to its relative small dimension and the consequent minor attitude to vulnerabilities,it could represent the ``last line of defense''.
+MH might also address some horizontal principles. 
+%Interop principle:
+%Qu'est ce que c'est:
+``Personalities'' are concretely a set of processes handling specific functions running in user-space. Implementing such features outside the kernel makes it easier for each user to rely on different instances of such personalities running concurrently, possibly in a distributed manner (DP4).
+%This process separation between users could enforce a straightforward mechanism to neutralize VM-to-VM attack from a malicious user. Moreover, user-space processes are easier to debug with commodity tools (GDB, valgrind).
+
+
+
+% Enlever les exemples qui ne sont pas significatifs.
+% A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
+% In addition, this approach is not far from the one proposed in DeHype \cite{wu2013TamHosHypMosDepExe}, where a consistent part of the KVM hypervisor has been demoted in user-space.
+
+% Texte additionnel sur les MH:
 %Architectural solutions were also created to make the hypervisor more minimal and flexible, targetting its two most vulnerable elements: (1) the core hypervisor itself; and (2) the management VM (e.g., Xen Dom0).
 %
 %A first class of solutions aims \textit{to reduce the hypervisor size}. The new hypervisor architecture should be more minimal, drawing inspiration from evolution in OS architecture (e.g., extensible, micro-, exo-, component-based kernels). Within the hypervisor are distinghuished security-critical modules from non-sensitive code. The aim is to expel as much code as possible from the TCB and target ultra-thin hypervisors, also known as \textit{micro-hypervisors}. For instance, some components of the hypervisor (e.g., device drivers, VM address space management) may be virtualized outside the micro-hypervisor, isolated, and restarted in case of compromise~\cite{NOVA}. The extreme case is to remove the virtualization layer altogether~\cite{NoHype}.
 %Unfortunately, although promising, such architectures usually require extensive code rewriting. They also provide a very limited number of resource management services unlike an operational IaaS infrastructure. They are thus hard to apply to mainstream hypervisors today.
-One of the benefits of micro-kernels is to enable to easily redesign a hierarchy of privileges. A user application normally trusts the micro-kernel and only the set of user-space services it requires. However, such drivers and libraries may not be trusted by every application run on the system. User applications share the system but may need to support completely different set of system services. This allows micro-kernels to implement different ``personalities''. However, the interest of such ``personalities'' has been largely reduced by the fact that system services, device drivers and even applications have to be completely re-designed to fit this new architectural pattern. Therefore, with the introduction of VMs, microkernels lost the battle in favor of hypervisors, in terms of popularity. However, the great advantage of tiny TCB, provided by microkernel, was not provided also by hypervisors. As we analyzed before, they present normally a monolithic architecture, like the great part of modern OS. This feature kept alive the interest in microkernels, in particular trying to couple microkernel benefits with virtualization\cite{Heiser}.
 
-Therefore, leveraging this concept of microkernels, a micro hypervisor (MH) is composed from a small kernel providing only essential functions, like scheduling, IPC, memory management and VMX extension. Several micro-hypervisor have been proposed in literature \cite{xmhf, nova}. They rely on the micro-kernel paradigm, extending it to virtualization. MH naturally satisfy vertical design principles (DP1,DP3, DP4). The tiny core could be considered the only system-critical componente of the architecture and, due to its relative small dimension and the consequent minor attitude to vulnerabilities,it could represent the ``last line of defense''.
-
-In addition, MH inherits the concept of micro-kernel to implement different ``personalities''. Those ``personalities'' are concretely a set of ``processes'' handling specific functions running in user-space. As those functions are implemented outside the kernel, each user could rely on a different instances of the hypervisor user-space process, that could coexist at the same time. This process separation between user could enforce a straightforward mechanism to neutralize VM-to-VM attack from a malicious user. Moreover, user-space processes are easier to debug with commodity tools (GDB, valgrind).
-Finally, this extraction process drives to a more solid platform, considering that user-space crashes are generally not fatal for the entire system integrity.  A possible example, that will be analyzed in next section, is the user-space VMM component of Nova, Vancouver, that resides in user-space \cite{nova}.
-In addition, this approach is not far from the one proposed in DeHype \cite{wu2013TamHosHypMosDepExe}, where a consistent part of the KVM hypervisor has been demoted in user-space.
+% Texte sur les MK, H, et MV
+%Embedded virtualization brings benefits to achieve several such properties, for instance abstraction and isolation by multiplexing and isolating VMs. However, current hypervisor architectures show strong limitations for many others. A main flaw is the huge TCB size, leading to reliability, security, and administration issues. Flexibility is rather poor, as for device sharing. RT guarantees are also difficult due to two-level system scheduling, i.e., threads at VM-level, and VMs at hypervisor-level. Finally, resource control remains coarse-grained through heavyweight VMs. 
+%
+%\textit{Micro-kernel} design has thus been increasingly popular to meet such challenges. Reducing the kernel to its fundamental elements, and making the rest of the OS deprivileged outside results in an extremely minimal TCB that may be formally verified. Strong isolation and high-perfromance communication between address spaces is also achieved through very efficient IPCs. Micro-kernels increasingly support virtualization: privileged instructions are intercepted and emulated in a dedicated system service. Control is finer than in the hypervisor, both by the granularity of isolation (lightweight threads), and by a unique control point of RT behavior in the scheduler. Device drivers are run in user space above the micro-kernel, allowing great flexibility for device sharing patterns. 
+%
+%Such architectures are very similar, although the hypervisor is driven by abstraction, to match closely virtual to real resources, while micro-kernels are guided by TCB minimization.
+%They tend to converge: the \textit{micro-visor} allows to run both VMs and threads over a lightweight execution environment~\cite{OKL4}. Like micro-kernels, it has a minimal TCB, and high-performance asynchronous IPCs between VMs, applications, or user-mode drivers. Like hypervisors, it allows virtualization of CPU, memory, or I/O through a hardware abstraction layer (HAL). Arbitrary control over resource partitioning in security domains or RT scheduling of threads or VMs is also possible. Finally, the micro-visor offers great architectural flexibility: drivers may be virtualized in a VM, or executed as system services in their own address space. 
 
 \subsection{Limitations}
 
-\noindent Despite the positives, MH approaches had demonstrated some limitations. Firstly, the straightforward one is the initial lack of hardware support, lack of device drivers are still a relevant Achilles' heel for this solutions, inherited from its ancestors microkernels. Fortunately, this kind of issue could be addressed leveraging I/O passthrough techniques, although it will cause exclusive allocation issues.
-
-Moreover, as reported in previous sections, several cloud computing issues are simply not addressable with general purpose hypervisor (GPH). However, they are commonly widely adopted and represent the bedrock of existing platform. Therefore, GPH exports wide and solid interfaces leveraged by a plenty of different software that is able to properly communicate and act through them on the virtualization layer. On the contrary, MH lack of cloud toolkit integration, requiring an explicit support to be written, not satysfing 3rd part compatibility requirements (DP5). GPH are tightly connected with cloud toolkit and could present solid interfaces to communicate with different tools. 
-
-Finally, microkernel modularization introduce a major challenge in architecture design. Due the increased complexity, for sake of kernel size, MH could generally lack of several virtualization features, commonly available on modern GPH hypervisor. For instance, XMHF does not support multiple guests. This kind of drawbacks could limits the potential interest in MH, even they are able to introduce several important features.
+\noindent The MH approach also showed several limitations. First, support for hardware is lacking, notably in terms of device drivers. Fortunately, this issue may be addressed leveraging I/O passthrough techniques, despite some resulting exclusive allocation challenges.
+Second, several cloud issues are simply not addressable with GPHs. However, GPHs are now widely adopted and foundation of existing cloud platforms. While a GPH exports mature APIs to upper software layers and is also tightly integrated with cloud toolkits, MHs lack such API stability and integration, requiring explicit dedicated code to be written -- thus violating DP5.  
+Third, for the sake of kernel size, MHs could lack several virtualization features commonly available on modern GPH hypervisors. For instance, XMHF does not support multiple guests. Such limitations applicable for MH architectures alone may be lifted partially or totally when applying MH design to NV architectures. 
 
 \section{Architecture Comparison}
 \label{sec:archcomp}
@@ -356,9 +421,74 @@ However, the effort to set up a GPH/MH is strongly dependent on the technique fo
 
 Therefore, a MH-based architecture could increase the feature set of current NV architectures, mostly vertically. The main remaining barrier is to come up with an MH implementation supporting HAV nested guests. We are currently working on a GPH/MH implementation based on Xen over NOVA aiming to lift this limitation using PV.
 
-\section{Security Architecture}
+\section{Towards 2D Security Management}
 \label{ref:arch}
 
+\indent We now sketch how the previous enhanced-NV design could enable to build a security architecture for a distributed cloud infrastructure  (DCI) satisfying both vertical and horizontal requirements. Such DCIs will face 2D threats, vertical spanning layers, and horizontal, spanning domains DCIs being multi-layer, multi-domain distributed cloud infrastructures. Vertically, attacks currently target several infrastructure layers (e.g., VMs, hypervisor). Unfortunately, most existing defenses are generally for single layers only. This makes it difficult to grasp the overall extent of an attack. Horizontally, threats may propagate through the network from cloud to cloud. Unfortunately, most existing defenses are for single clouds only. Lack of interoperability in security policies and mechanisms is thus a major barrier to  unified hybrid cloud security. DCI security thus requires 2D protection.
+
+We consider the security architecture shown in Figure~\ref{fig:archisecu}. 
+
+Supercloud
+SUPERCLOUD Layer built SS cloud
+Also security management both vertically and horizontally.
+
+OS:
+
+Provider MH: Assumption min V, XenDisagregated...
+Above GPH: 
+Achieve Vertical security Cross Layer security
+
+GPH allows also to layer of interoperability horizontal blanket layer above the different MH to enalbe self-service security.
+
+On the top are the VM built self-service security where security is personalized/customized.
+Automation.
+Cross-Layer Framewokr: VESPA
+Cross-Domain Framework:
+360 Atuomation
+
+
+ This means: providing vertically a cross-layer integrated vision of security of the cloud and SUPERCLOUD infrastructure; defining horizontally a security abstraction layer to achieve a homogeneous level of security across clouds independently from underlying provider mechanisms; and integrating both dimensions smoothly. This approach is key to providing a unified view of security of the SUPERCLOUD.
+Our ambition is to define a security supervision architecture and framework for the SUPERCLOUD enabling this 360 view of security management with a high level of automation. Thus, the SUPERCLOUD will bring unified, simple management of security for cloud of clouds. 
+
+ Our vision is that the security of the SUPERCLOUD should be both self-managed and 360.
+
+The second challenge means that although many defense mechanisms may be leveraged in this 2D landscape, they remain difficult to configure and to reconcile. The current “by hand” approach becomes a nightmare for security administrators. Despite some automated solutions for managing security of single clouds, there is currently no solution truly applicable to federations of clouds in practice.
+
+two major security challenges: 
+
+In terms of architecture:
+The northbound, user-centric super-cloud API will implement self service security and dependability, allowing to build self-service clouds (SSC) where VM, network, and storage security may be personalized independently from the underlying provider. Such clouds may be defined at the service level to the full IaaS, relationships between SSC being flat or nested, also with complex trust relationships between sets of SSC according to the ecosystem relationships of the super-cloud providers providing the SSC. 
+The southbound, provider-centric super-cloud API will define a unified security and dependenability management plane of the compute, data, and network resources independently from providers. This may apply for B2B use cases to management of clouds of clouds but also to device-to-cloud scenarios if devices are considered, with possible extensions to the personal cloud for device-to-device scenarios, the SSC taking the form of personal cloud-based digital infospheres where security and dependability may be totally user-controlled.
+...
+The SUPERCLOUD will fulfill that vision with a two-level infrastructure:
+•	The lower part of the SUPERCLOUD is be a distributed infrastructure will realize the distribute resource abstraction layer federating distributed cloud resources and implementing the self-service security to build SSC. It will implement the northbound, user-centric super-cloud API.
+•	Above, the upper part of the SUPERCLOUD will be a supervision infrastructure providing a set of security and resilience services to guarantee the security of the overall SUPERCLOUD architecture. It will realizing self-service security, end-to-end security, and resilience. It will implement the southbound, provider-centric super-cloud API.
+
+and security management complexity. Th
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=10cm]{DCCArchitecture.png}
+\end{center}
+\caption{Security Architecture.}
+\label{fig:archisecu}
+\end{figure}
+
+A DC 
+%Our vision is that the security of the SUPERCLOUD should be both self-managed and 360°. Security will be autonomically managed through orchestration of a number of self-protection loops governing interactions between detection, decision, and reaction components. This approach enables simpler, stronger, and more efficient security management to detect and respond to threats [CPW03]. Security monitoring will also be 360°. This means: providing vertically a cross-layer integrated vision of security of the cloud and SUPERCLOUD infrastructure; defining horizontally a security abstraction layer to achieve a homogeneous level of security across clouds independently from underlying provider mechanisms; and integrating both dimensions smoothly. This approach is key to providing a unified view of security of the SUPERCLOUD.
+%Our ambition is to define a security supervision architecture and framework for the SUPERCLOUD enabling this 360° view of security management with a high level of automation. Thus, the SUPERCLOUD will bring unified, simple management of security for cloud of clouds. 
+
+Autonomous
+
+Supercloud architecture
+
+Proposition of Architecture
+
+Base Layer
+
+Supercloud layer
+
+VESPA.
 
 In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on .
 
@@ -368,6 +498,29 @@ In the previous sections we proposed a functional analysis of cloud architecture
 \item \textbf{3rd part compatibility} From a user point of view the architecture still exports the same interfaces provided by the Xen hypervisor, allowing the user to keep its applications unchanged.
 \item \textbf{Fail-safe components architecture} Moreover, the tiny core is the only safety-critical software component. The system could potentially be able to recover any crash in different user-space components.
 \end{itemize}
+
+%The SUPERCLOUD project aims to define the architecture and build the infrastructure to fulfill the vision of user-centric secure and dependable management of a clouds of clouds. Our approach will be to define a new distributed architectural plane, the super-cloud providing an end-to-end interface both between user-centric and provider-centric views of multiple clouds. Its role will be both to provide a distributed resource abstraction and flexible but unified control for management of security and resilience.
+%From the user perspective, the super-cloud will enable user-centric security and dependability through a unified distribution layer for cloud resources, independently from their type (computation, storage, and network) and from underlying cloud providers. It thus forms an intermediation layer for resources between their production by providers and their consumption by users. This in line with the vision introduced by IBM [X] as well as with the utility computing paradigm [X], but will go well beyond, leveraging this distribution layer to explore high customizability of user cloud security and dependability according to well-defined SLAs. 
+%From the provider perspective, the super-cloud will also enable provider-independent control over security and resilience over the overall distributed cloud infrastructure, security being autonomous managed and guaranteed end-to-end. This will also make the resource distribution layer both secure and resilient. 
+%The level of abstraction, from system to middleware interoperability of the super-cloud be also be tuned to allow trade-offs between user-centric and provider-centric control for security services. 
+%In terms of architecture:
+%The northbound, user-centric super-cloud API will implement self service security and dependability, allowing to build self-service clouds (SSC) where VM, network, and storage security may be personalized independently from the underlying provider. Such clouds may be defined at the service level to the full IaaS, relationships between SSC being flat or nested, also with complex trust relationships between sets of SSC according to the ecosystem relationships of the super-cloud providers providing the SSC. 
+%The southbound, provider-centric super-cloud API will define a unified security and dependenability management plane of the compute, data, and network resources independently from providers. This may apply for B2B use cases to management of clouds of clouds but also to device-to-cloud scenarios if devices are considered, with possible extensions to the personal cloud for device-to-device scenarios, the SSC taking the form of personal cloud-based digital infospheres where security and dependability may be totally user-controlled.
+%...
+%The SUPERCLOUD will fulfill that vision with a two-level infrastructure:
+%•	The lower part of the SUPERCLOUD is be a distributed infrastructure will realize the distribute resource abstraction layer federating distributed cloud resources and implementing the self-service security to build SSC. It will implement the northbound, user-centric super-cloud API.
+%•	Above, the upper part of the SUPERCLOUD will be a supervision infrastructure providing a set of security and resilience services to guarantee the security of the overall SUPERCLOUD architecture. It will realizing self-service security, end-to-end security, and resilience. It will implement the southbound, provider-centric super-cloud API.
+%In what follows, we describe the SUPECLOUD vision for each self-service security, self-managed security, end-to-end security and resilience properties. 
+%
+%For computing workloads, user-centric cloud security management faces two challenges.
+%•	Lack of IaaS infrastructure openness: provider-controlled immutable hypervisors (or that mask access to the hardware) prevent users from taking advantage of hypervisor-level advanced resource management and security services such as high availability or VM introspection for fine-grained VM misbehavior detection and reaction. Such examples of vendor lock-in are already a notorious issue for single provider infrastructures [CSA Guidance]. They are a real barrier for hybrid clouds: the varying degree of openness of the underlying IaaS forces to achieve security interoperability in upper software layers instead of at system level as in multi-IaaS orchestration platforms, highly reducing user control over security management. Such limitations also prevent fine-grained trade-offs between provider and user control over security : among security services, users cannot choose between those to customize, and those to delegate to the provider infrastructure.
+%•	Security threats for customer VMs: large, complex, overprivileged hypervisors are a serious risk for VMs [CSATT]. The assumption of a trusted hypervisor is no more, illustrated through many examples of VM escapes, breaking hypervisor isolation through exploitaiton of device drivers vulnerabilities [Virtunoid, CloudBurst]. A multi-layer approach to IaaS security is needed considering lower layers, to guarantee VM security even if the hypervisor layer is compromised. This challenge is intrisically linked with openness and flexibility issues: from a user perspective, to protect their VMs from an untrusted provider infrastructure, customers may wish adding their own security modules (or layer) in the infrastructure, provided it is open enough. Conversely, a provider may also wish to benefit from an open hypervisor architecture to harden its IaaS against rogue VM behaviors.
+%Earlier IaaS architectures such as disaggregated hypervisors or nested virtualization provided partial answers to either of those issues but not both. Hypervisor disaggregation (for the Dom0 or the core hypervisor) achieves flexibility through the definition of clearly separated access control domains between provider-centric and user-centric security management planes where fine-grained trade-offs may be reached [SSC]. This approach is compatible with legacy hypervisors (Dom0 case) or requires new architectures (core hypervisor case). However, it only addresses security and flexibility challenges in a single cloud context, but not for interoperability of multiple independent hypervisors. Nested virtualization addresses the (vertical) security challenge by placing an additional hardware-protected security monitor beneath the untrusted virtualization layer [Turtles, CloudVisor] -- requiring a sufficiently open IaaS. It also features (horizontal) flexibility and interoperability benefits by defining a blanket layer on top of existing provider hypervisors in a hybrid cloud setting, enabler for self-service security for clouds of clouds [XenBlanket]. However, such horizontal and vertical benefits have not yet been combined in a unified security architecture. Moreover, the additional layer separation might also make user vs. provider trade-offs more coarse-grained than the previous approach.
+%Hence, in SUPERCLOUD, we propose to define a new IaaS security architecture for distributed clouds that may combine the benefits of the two previous architectural approaches in terms of both layered design and modularity to achieve self-service cloud security with tuneable, fine-grained trade-offs with provider-centric security to protect customer VMs. The benefits of this hybrid approach will be to lift both barriers simultaneously, but also to be applicable in a large variety of underlying provider infrastructures. For instance, if the underlying hypervisor is not open, leveraging the benefits of nested virtualization for hypervisor interoperability; and otherwise, using either approach, depending on desired security vs. performance trade-offs, and compatibility with legacy systems or deployment of new security hardened IaaS architectures.
+%
+%
+
+
 
 %
 %%
