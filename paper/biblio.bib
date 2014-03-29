@@ -44,20 +44,6 @@
   Author                   = {McCune, Jonathan M. and Li, Yanlin and Qu, Ning and Zhou, Zongwei and Datta, Anupam and Gligor, Virgil D. and Perrig, Adrian},
   Booktitle                = {{IEEE Symposium on Security and Privacy}},
   Year                     = {2010},
-  Pages                    = {143--158},
-  Publisher                = {IEEE Computer Society},
-
-  Added-at                 = {2010-07-21T16:02:45.000+0200},
-  Biburl                   = {http://www.bibsonomy.org/bibtex/2b3c4928d1e56b4b72775d557ca21e7bc/dblp},
-  Crossref                 = {conf/sp/2010},
-  Date                     = {2010-07-13},
-  Ee                       = {http://doi.ieeecomputersociety.org/10.1109/SP.2010.17},
-  Interhash                = {afb6680dbf9dcd281d3124b0021c264a},
-  Intrahash                = {b3c4928d1e56b4b72775d557ca21e7bc},
-  ISBN                     = {978-0-7695-4035-1},
-  Keywords                 = {dblp},
-  Url                      = {http://dblp.uni-trier.de/db/conf/sp/sp2010.html#McCuneLQZDGP10},
-  X-fetchedfrom            = {Bibsonomy}
 }
 
 @InProceedings{rec:eli,
@@ -100,7 +86,21 @@
  title = {{The Xen-Blanket: Virtualize Once, Run Everywhere}},
  booktitle = {{ACM European Conference on Computer Systems (EUROSYS)}},
  year = {2012},
-} 
+}
+
+@inproceedings{XOAR,
+ author = {Patrick Colp and Mihir Nanavati and
+           Jun Zhu and
+           William Aiello and
+           George Coker and
+           Tim Deegan and
+           Peter Loscocco and
+           Andrew Warfield},
+ title = {{Breaking Up is Hard to Do: Security and Functionality in a Commodity Hypervisor}},
+ booktitle = {{ACM Symposium on Operating Systems
+               Principles (SOSP)}},
+ year = {2011},
+}
 
 @Misc{bug:kvm,
   Title                    = {{Xen as L1 hypervisor issue}},
@@ -178,6 +178,24 @@
 } 
 
 
+@inproceedings{cloudvisor:zhang,
+ author = {Zhang, Fengzhe and Chen, Jin and Chen, Haibo and Zang, Binyu},
+ title = {{CloudVisor: Retrofitting Protection of Virtual Machines in Multi-Tenant Cloud with Nested Virtualization}},
+ booktitle = {{ACM Symposium on Operating Systems
+               Principles (SOSP)}},
+ year = {2011},
+} 
+
+@article{xclo:blank,
+  author = {Dan Williams and Hani Jamjoom and Hakim Weatherspoon}, 
+  title = {{Plug into the Supercloud}},
+  journal = {{IEEE Internet Computing, Special Issue on Virtualization}}, 
+	volume = {17},
+	number = {2},
+	year = {2013},
+}
+
+
 @misc{nested:berghmans,
   Title                    = {{Nesting Virtual Machines in Virtualization Test Frameworks}},
   Author                   = {Berghmans, Oliver},
@@ -227,6 +245,20 @@
  year = {2011},
 }
 
+@inproceedings{OKL4,
+  author    = {Gernot Heiser and Ben Leslie},
+  title     = {{The OKL4 Microvisor: Convergence Point of Microkernels and Hypervisors}},
+  booktitle = {{ACM SIGCOMM Asia-Pacific Workshop on Systems (APSys)}},
+  year      = {2010},
+}
+
+@inproceedings{Inception,
+ author = {Changbin Liu and Yun Mao},
+ title = {{Inception: Towards a Nested Cloud Architecture}},
+ booktitle = {{5th USENIX Workshop on Hot Topics in Cloud Computing (HotCloud)}},
+ year = {2013},
+}
+
 @Article{Bugnion:2012:BVX:2382553.2382554,
   Title                    = {{Bringing Virtualization to the x86 Architecture with the Original VMware Workstation}},
   Author                   = {Bugnion, Edouard and Devine, Scott and Rosenblum, Mendel and Sugerman, Jeremy and Wang, Edward Y.},
@@ -250,26 +282,6 @@
   Url                      = {http://doi.acm.org/10.1145/2382553.2382554}
 }
 
-@InProceedings{ssc:art,
-  Title                    = {{Self-service cloud computing}},
-  Author                   = {Butt, Shakeel and Lagar-Cavilla, H. Andr\'{e}s and Srivastava, Abhinav and Ganapathy, Vinod},
-  Booktitle                = {{Proceedings of the 2012 ACM conference on Computer and communications security}},
-  Year                     = {2012},
-
-  Address                  = {New York, NY, USA},
-  Pages                    = {253--264},
-  Publisher                = {ACM},
-  Series                   = {{CCS '12}},
-
-  Acmid                    = {2382226},
-  Doi                      = {10.1145/2382196.2382226},
-  ISBN                     = {978-1-4503-1651-4},
-  Keywords                 = {cloud computing; privacy; security; trust},
-  Location                 = {Raleigh, North Carolina, USA},
-  Numpages                 = {12},
-  Url                      = {http://doi.acm.org/10.1145/2382196.2382226}
-}
-
 @Misc{Intel:vtx,
   Title                    = {{Virtualization and Virtual Machines}},
 
@@ -279,10 +291,17 @@
   Url                      = {http://www.cs.nthu.edu.tw/~ychung/slides/Virtualization/Intel VT.pptx}
 }
 
+@inproceedings{ssc:art,
+ author = {Butt, Shakeel and Lagar-Cavilla, H. Andr{\'e}s and Srivastava, Abhinav and Ganapathy, Vinod},
+ title = {{Self-Service Cloud Computing}},
+ booktitle = {{ACM Conference on Computer and Communications Security (CCS)}},
+ year = {2012},
+}
+
 @Article{hvx:usenix,
   Title                    = {{HVX: Virtualizing the Cloud}},
   Author                   = {Fishman, Alex and Rapoport, Mike and Budilovsky, Evgeny and Eidus, Izik},
-  Journal                  = {Proceedings of HotCloud13},
+  Journal                  = {{5th USENIX Workshop on Hot Topics in Cloud Computing (HotCloud)}},
   Year                     = {2013}
 }
 
@@ -347,21 +366,8 @@
 @InProceedings{Klein:2009,
   Title                    = {{seL4: Formal Verification of an OS Kernel}},
   Author                   = {Klein, Gerwin and Elphinstone, Kevin and Heiser, Gernot and Andronick, June and Cock, David and Derrin, Philip and Elkaduwe, Dhammika and Engelhardt, Kai and Kolanski, Rafal and Norrish, Michael and Sewell, Thomas and Tuch, Harvey and Winwood, Simon},
-  Booktitle                = {{Proceedings of the ACM SIGOPS 22Nd Symposium on Operating Systems Principles}},
+  Booktitle                = {{ACM Symposium on Operating Systems Principles (SOSP)}},
   Year                     = {2009},
-
-  Address                  = {New York, NY, USA},
-  Pages                    = {207--220},
-  Publisher                = {ACM},
-  Series                   = {{SOSP '09}},
-
-  Acmid                    = {1629596},
-  Doi                      = {10.1145/1629575.1629596},
-  ISBN                     = {978-1-60558-752-3},
-  Keywords                 = {isabelle/hol; l4; microkernel; sel4},
-  Location                 = {Big Sky, Montana, USA},
-  Numpages                 = {14},
-  Url                      = {http://doi.acm.org/10.1145/1629575.1629596}
 }
 
 @Misc{virt:lich,
@@ -428,38 +434,23 @@
   Author                   = {Mell, Peter and Grance, Timothy},
   Institution              = {National Institute of Standards and Technology (NIST)},
   Year                     = {2011},
-
   Address                  = {Gaithersburg, MD},
   Month                    = {September},
   Number                   = {800-145},
-
-  Abstract                 = {Cloud computing is an evolving paradigm. The NIST definition characterizes important aspects of cloud computing and is intended to serve as a means for broad comparisons of cloud services and deployment strategies, and to provide a baseline for discussion from what is cloud computing to how to best use cloud computing. The service and deployment models defined form a simple taxonomy that is not intended to prescribe or constrain any particular method of deployment, service delivery, or business operation.},
-  Added-at                 = {2013-03-01T12:10:43.000+0100},
-  Groups                   = {public},
-  Interhash                = {2d8930e9d6b54432f1a182ce93e1d6ab},
-  Intrahash                = {72c3cbc0c53129bc3cbd1f14dca7b930},
-  Keywords                 = {cloud computing definition nist},
-  Organization             = {National Institute of Standards and Technology (NIST)},
-  Timestamp                = {2013-03-01 12:10:43},
-  Url                      = {http://csrc.nist.gov/publications/nistpubs/800-145/SP800-145.pdf},
-  Username                 = {porta},
-  X-fetchedfrom            = {Bibsonomy}
 }
 
 @misc{vmcs:nakajima,
-  Title                    = {{Making nested virtualization real by using hardware virtualization features}},
+  Title                    = {{Making Nested Virtualization Real by Using Hardware Virtualization Features}},
   Author                   = {Nakajima, Jun},
   Year                     = {2013},
-  Url                      = {http://events.linuxfoundation.org/sites/events/files/cojp13_nakajima.pdf}
+  Url                      = {\texttt{http://events.linuxfoundation.org/sites/events/files/cojp13_nakajima.pdf}}
 }
 
 @InProceedings{bot:att,
   Title                    = {{Characterizing Hypervisor Vulnerabilities in Cloud Computing Servers}},
   Author                   = {Perez-Botero, Diego and Szefer, Jakub and Lee, Ruby B.},
-  Booktitle                = {{Proceedings of the Workshop on Security in Cloud Computing}},
+  Booktitle                = {{International Workshop on Security in Cloud Computing}},
   Year                     = {2013},
-  Month                    = {May},
-  Series                   = {{SCC}}
 }
 
 @Article{Popek:1974:FRV:361011.361073,
@@ -481,25 +472,12 @@
   Url                      = {http://genode.org/documentation/platforms/nova}
 }
 
-@Misc{sec:you,
-  Title                    = {{Hey, you, get off of my cloud: exploring information leakage in third-party compute clouds}},
-
-  Author                   = {Ristenpart, Thomas and Tromer, Eran and Shacham, Hovav and Savage, Stefan},
-  Year                     = {2009},
-
-  Acmid                    = {1653687},
-  Address                  = {New York, NY, USA},
-  Booktitle                = {{Proceedings of the 16th ACM conference on Computer and communications security}},
-  Doi                      = {10.1145/1653662.1653687},
-  ISBN                     = {978-1-60558-894-0},
-  Keywords                 = {cloud computing; side channels; virtual machine security},
-  Location                 = {Chicago, Illinois, USA},
-  Numpages                 = {14},
-  Pages                    = {199--212},
-  Publisher                = {ACM},
-  Series                   = {{CCS '09}},
-  Url                      = {http://doi.acm.org/10.1145/1653662.1653687}
-}
+@inproceedings{sec:you,
+ author = {Ristenpart, Thomas and Tromer, Eran and Shacham, Hovav and Savage, Stefan},
+ title = {{Hey, You, Get off of My Cloud: Exploring Information Leakage in Third-party Compute Clouds}},
+ booktitle = {{ACM Conference on Computer and Communications Security (CCS)}},
+ year = {2009},
+} 
 
 @Article{dav:xcp,
   Title                    = {{Demo of XCP storage driver domains}},
@@ -581,20 +559,6 @@
   Url                      = {http://dl.acm.org/citation.cfm?id=2170444.2170460}
 }
 
-@misc{xclo:blank,
-  Title                    = {{Plug into the Supercloud}},
-  Address                  = {Los Alamitos, CA, USA},
-  Author                   = {Williams, Dan and Jamjoom, Hani and Weatherspoon, Hakim},
-  Doi                      = {10.1109/MIC.2012.145},
-  ISSN                     = {1089-7801},
-  Journal                  = {IEEE Internet Computing},
-  Number                   = {2},
-  Pages                    = {28--34},
-  Publisher                = {IEEE Computer Society},
-  Volume                   = {17},
-  Year                     = {2013}
-}
-
 @Article{over:amazon,
   Title                    = {{Has Amazon EC2 become over subscribed?}},
   Author                   = {Williamson, Alan},
@@ -615,28 +579,17 @@
 @InProceedings{wu2013TamHosHypMosDepExe,
   Title                    = {{Taming Hosted Hypervisors with (Mostly) Deprivileged Execution}},
   Author                   = {Wu, Chiachih and Wang, Zhi and Jiang, Xuxian},
-  Booktitle                = {{Proceedings of the Network and Distributed System Security Symposium (NDSS), San Diego, CA}},
+  Booktitle                = {{Network and Distributed System Security Symposium (NDSS)}},
   Year                     = {2013},
-
-  Url                      = {http://www4.ncsu.edu/~cwu10/files/NDSS13_DEHYPE.pdf},
-  X-fetchedfrom            = {Google Scholar}
 }
 
 @Misc{xen:test,
-  Title                    = {{nested virtualizaiton test report for Xen 4.3-RC1}},
-
+  Title                    = {{Nested Virtualization Test Report for Xen 4.3-RC1}},
   Author                   = {Yongjie, Ren},
-
   Publisher                = {Xen Devel},
-  Url                      = {http://lists.xen.org/archives/html/xen-devel/2013-05/msg01145.html}
+  Url                      = {\url{http://lists.xen.org/archives/html/xen-devel/2013-05/msg01145.html}}
 }
 
-@InProceedings{cloudvisor:zhang,
-  Title                    = {{CloudVisor: Retrofitting Protection of Virtual Machines in Multi-Tenant Cloud with Nested Virtualization}},
-  Author                   = {Zhang, Fengzhe and Chen, Jin and Chen, Haibo and Zang, Binyu},
-  Booktitle                = {{Twenty-Third ACM Symposium on Operating Systems Principles (SOSP)}},
-  Year                     = {2011},
-}
 
 @Article{dbt:wiki,
   Title                    = {{Dynamic Binary Translation}},
