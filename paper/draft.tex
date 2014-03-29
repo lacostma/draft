@@ -278,13 +278,13 @@ Finally, microkernel modularization introduce a major challenge in architecture 
 \begin{center}
 \includegraphics[width=2\columnwidth]{globalcut.png}
 \end{center}
-\caption{}
+\caption{Different Types of Nested Architectures.}
 \label{fig:io}
 \end{figure*}
 
-\noindent Adding an extra layer of virtualization enables to introduce a wide range of new features in the IaaS infrastructure, but does not reduce the TCB size. As already discussed, introducing MH design within a nested IaaS architecture could represent a new approach to improve NV benefits by overcoming such limitations. In what follows, we analyze the four possible architectures to achieve nesting of GPH and MH, highlighting their potential, and assessing their benefits and weaknesses w.r.t. to the design principles of Section~\ref{ref:challenges}, as well as their cost of implementation.
+\noindent Adding an extra layer of virtualization enables to introduce a wide range of new features in the IaaS infrastructure, but does not reduce the TCB size. As already discussed, introducing MH design within a nested IaaS architecture could represent a new approach to improve NV benefits by overcoming such limitations. In what follows, we analyze the four possible architectures shown in Figure~\ref{fig:io} to achieve nesting of GPH and MH, highlighting their potential, and assessing their benefits and weaknesses w.r.t. to the design principles of Section~\ref{ref:challenges}, as well as their cost of implementation.
 
-\subsection{GPH Over GPH}
+\subsection{GPH/GPH}
 
 \noindent The first architecture only features GPHs in both layers to serve as point of comparison. This type of architecture enables several remarkable features related to VM management flexibility such as live migration over different platforms, and transparent migration of virtualized clusters across data centers, fulfilling principle DP4. More generally, assuming complete and correct support of virtualization primitives for nested hardware in mainstream hypervisors, this architecture satisfies all horizontal design principles. 
 
@@ -293,77 +293,74 @@ However, it fails to safisfy vertical design principles as TCB size is that of c
 %Although this architectures presents an extra layer between the nested guest, normally controlled by the cloud user and the system critical part, L0, the latter is far from a satisfying security level. The TCB of KVM that is represented by the entire Linux Kernel is normally around 200 KLoCs, considering the medium size of a deployed Linux kernel.
 %Moreover, default KVM configuration does not provide a transparent protection mechanism between different VMs, so that compromising one instance of QEMU, that is executed in user-space, an attacker could compromise all the others VMs on the platform.
 
-\subsection{MH Over MH}
+\subsection{MH/MH}
 
-\noindent This architecture is considered only to highlight improvements brought by a MH design compared to a GPH over GPH architecture. An MH over MH implementation would meet the vertical requirements missing in the previous approach. 
+\noindent This architecture is considered only to highlight improvements brought by a MH design compared to a GPH/GPH architecture. An MH/MH implementation would meet the vertical requirements missing in the previous approach. 
 As in single-layer MH architectures, hypervisor disaggregation and minimization overcomes issues posed by monolithic system architectures and over-privileged administrative VMs (DP1). The smaller resulting TCB also improves resilience of the platform against a large set of software failures (DP2) and reduces the surface of attack of the most privileged part of the IaaS infrastructure (DP3). 
 
 However, the interest this class of architecture remains limited as it cannot overcome any of the generally cited issues of single-layer MHs such as compatibility with legacy hypervisor architectures (DP5). While several horizontal properties are theoretically achievable, they would require a large development effort to implement the relevant features such as interoperable advanced resource management. Moreover, the lack of nested VMX support prevents testing in practice this type of architecture, as MH usually rely on VMX primitives to create nested HVM guests.
 
 Overall, with this architecture, if vertical challenges are well addressed as in single-layer MHs, it does not provide any improvement for horizontal challenges, despite NV being used to bridge gaps between IaaS platform eco-systems.
 
-\subsection{MH Over GPH}
+\subsection{MH/GPH}
 \label{par:mog}
 
 \noindent The third architecture aims to alleviate security concerns. It combines a GPH as L0 and a MH as L1. 
 %Several MH are proposed in literature focusing on different .
 %Therefore, this model tries to exploit microhypervisor as L1 hypervisor in order to enforce better isolation between L2 and L0. L1 will exploit the emulated nested VMX provided by GPH L0 and virtualize L2. 
 %With this approach, we try to isolate the attacker in a VM virtualized on a secured layer, in order to prevent attacks to L0. The attacker would have to face with an essential virtualization layer and it would not be able to attack the back-end virtualization layer. 
-This approach is interesting as it may be easily deployed without requiring any extra code addition to the GPH.  Hardware support is not a real barrier as existing GPH-based platforms could potentially export nested VMX features to guests. Even if this is not yet the case in modern cloud platforms, this lack may be considered temporary due to the experimental status of such features.
+This approach is interesting as it may be easily deployed without requiring any extra code addition to the GPH. Hardware support is not a real barrier as existing GPH-based platforms could potentially export nested VMX features to guests. Even if this is not yet the case in modern cloud platforms, this lack may be considered temporary due to the experimental status of such features.
 
 However, there is no TCB reduction as the code size running in L0 kernel space is as big as before. 
 Besides, adopting a MH as L1 prevents using inter-platform enhanced features. As already seen for MH design, the price of having a thin hypervisor is normally paid with a lack of certain features. For example, XMHF only supports a single guest~\cite{xmhf}. Thus, this architectural approach cannot provide any new horizontal features leveraging NV. Therefore, this approach can only provide the same features as those deployed today, with an increased but not sufficient level of isolation.
 
-\subsection{GPH Over MH}
+\subsection{GPH/MH}
 \label{par:gom}
 
-\noindent This approach achieves a smaller TCB than other architectures, due increased modularity brought by the micro-kernel-like design of the L0 layer -- satisfying DP3. Leveraging a GPH like Xen or KVM for the L1 layer provides the user with an environment looking identical to those used in production today -- satisfying DP5. The L1 GPH is normally integrated with modern cloud toolkits like OpenStack and will thus support third-party applications -- satisfying DP4.
+\noindent This last approach achieves a smaller TCB than other architectures, due increased modularity brought by the micro-kernel-like design of the L0 layer -- satisfying DP3. Leveraging a GPH like Xen or KVM for the L1 layer provides the user with an environment looking identical to those used in production today -- satisfying DP5. The L1 GPH is normally integrated with modern cloud toolkits like OpenStack, and will thus support third-party applications -- satisfying DP4.
 Therefore, this architecture achieves a stronger level of isolation due to vertical use of NV to introduce an additional hardware-protected security monitor. Thanks to the GPH, the MH layer remains transparent to the user and should not impact the functional properties of the IaaS platform.
 
-The first class of possible drawbacks of this architecture is represented by the necessity to expose to the L1 nested hypervisor the nested VMX extension to let him ``nest'' another HVM guest. This is experimentally done by GPH like Xen and KVM, but it is generally not included in the essential features provided by a minimal micro-hypervisor. As reported in XMHF paper \cite{xmhf}, the amount of lines of code for nested VMX is around 1KLOC. 
-More generally, from an architectural point of view, the general MH minimalist attitude could represent a limitation to general preservation of existing platform functions. The constraint of privileged code size forces normally MH developers to drop some features, considered not essential. Therefore, several limitations could arise not only for nested virtualization proper features, but also for other class of features. For instance, XHMF is able only to virtualize one L1 instance at time. This is acceptable if the platform objective is limited to be provided of a secure core, but dramatically limits the possibility of having a platform model able to give the user the possibility to run its proper hypervisor as L1.
+This class of architecture may suffer from two types of limitations. First, nested VMX extensions must be exposed to the L1 hypervisor to let him ``nest'' another HVM guest. This requirement is implemented by GPHs like Xen and KVM, but usually not included in the key features to be provided by a MH: implementing nested VMX may be estimated to around 1KLoC, to be compared with the size of a typical MH (2-20 KLoC)~\cite{xmhf}.
+More generally, the MH quest towards ever increasing minimalism could represent a serious limitation to preserving functions of existing platforms: the constraint of privileged code size may force MH developpers to drop some features considered as non-essential. This may apply to NV-related primitives, but also to other types of features. For instance, XMHF may only virtualize a single L1 instance at a time. While this may be acceptable if the platform objective to enforce strict resource access control in a single-provider private cloud, it hinders having a platform model enabling the user to run its own hypervisor as L1 to set up a self-service cloud independently from the underlying provider -- as in that case, multiple L1 hypervisors would need to run concurrently on the L0.
 
-Another important class is the necessity to explicit hardware devices support. Device drivers represents a general Achilles' heel of MH, due the general cost of development. However, this class of problem could be addressed leveraging device assignment. L1 GPH hypervisor will handle the real device, using the proper driver now demoted to run in a lower level of privilege. It has to be underlined that this solution could represent a feasible approach only if it possible to overcome the exclusive allocation trouble (SR-IOV).
+Second, device drivers should be correctly managed. Drivers are a major MH issue, due to costs of development or of adaptation to a new architecture. Such challenges may be addressed using device assignment: the L1 GPH hypervisor manage the physical device with the proper driver now running in a lower level of privilege. To be workable, this approach would require exclusive allocation to be simply implementable, e.g., using SR-IOV~\cite{sriov}.
 
 \begin{table*}
-\label{fin:conf}
+\caption{Architecture Comparison.\label{fin:conf}}
 \centering
 \begin{tabular}{llcllll}
 \toprule
-Id & Functional design Principle & Class & GPH over GPH & MH over MH & MH over GPH & GPH over MH\\
+Id & Functional Design Principle & Class of Requirement & GPH/GPH & MH/MH & MH/GPH & GPH/MH\\
 \midrule
-DP1 & User-Data privacy & Vertical & $\times$  & $\checkmark$ & $\times $ & $\checkmark$ \\
-DP2 & Fail-Safe modular architecture & Vertical & $\times$  & $\checkmark$ & $\times$ & $\checkmark$ \\
-DP3 & Small TCB & Vertical &  $\times$& $\checkmark$ & $\times$ & $\checkmark$ \\
-DP4 & Inter-platform support & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
-DP5 & 3rd part compatibility & Horizontal & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
-NDP1 & Minimize code addition & - & $\checkmark$  & $\times$ & $\times$ & $\checkmark$ \\
+DP1  & User-Data Privacy               & Vertical   & $\times$      & $\checkmark$  & $\times$ & $\checkmark$ \\
+DP2  & Fail-Safe modular architecture  & Vertical   & $\times$      & $\checkmark$  & $\times$ & $\checkmark$ \\
+DP3  & Small TCB                       & Vertical   &  $\times$     & $\checkmark$  & $\times$ & $\checkmark$ \\
+DP4  & Inter-Platform support          & Horizontal & $\checkmark$  & $\times$      & $\times$ & $\checkmark$ \\
+DP5  & Compatibility with Legacy       & Horizontal & $\checkmark$  & $\times$      & $\times$ & $\checkmark$ \\
+NDP1 & Minimal Additional Code         & --         & $\checkmark$  & $\times$      & $\times$ & $\checkmark$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
  
-\subsection{Lessons Learned}
+\subsection{Discussion}
 
-To conclude, this section provides a short comparison between different platforms, contrasting architecture features above the two main different types of benefits given by nested virtualization, as reported widely in literature \cite{art:blan, nested:berghmans,  cloudvisor:zhang, turtle:ibm}. The first could be identified in the augmented degree of isolation the architecture could enforce between host OS and the "customer" point of access, allowing to redesign the security architecture of the whole platform. The second one is represented by the possibility to leverage multiple virtualization layers to easily define inter-platform policy and operations between different platforms.
-In table \ref{fin:conf}, it is possible a summary of the previous analysis. To conclude, GPH over MH is the most interesting one in order to enlarge nested virtualization promised benefit. This architecture with a solid and secured MH as L0 is the only able to reduce the platform TCB and this could be a key point to obtain more protected infrastructure, .
-Firstly, adopting a MH as architecture trusted core, we will have a secure layer guaranteeing that administrator could not lose the control of the system. Klein et Al. \cite{Klein:2009} have demonstrated that a kernel with less than 10KLoC could be formally verified, under several conditions. This is far from be achievable today with standard GPH over GPH approach where the core is not tiny and the TCB is an order of 
-magnitude bigger than MH \cite{nova}. 
+\noindent Overall, how do the architectures above compare w.r.t. to the two main reported benefits of NV, i.e., vertical, through an increased level of isolation between hypervisor and customer VMs, and horizontal to easily achieve multiple provider platform interoperability at system level? Table~\ref{fin:conf} summarizes the previous analysis. 
 
-However, the effort to set up a GPH over MH is strongly dependent on which technique leveraging for virtualizing L2. As stated in paragraph \ref{par:gom}, with L2 guest virtualized with the hardware assitance technique, the most popular one, the MH needs to export nVMX at least. 
-On the contrary, adopting paravirtualization/Dynamic binary translation for L2 does not necessitate a particular hardware support and so it could not be necessary patch the MH to set up a platform. 
-However, it has not be underestimated, however, that para-virtualization supports only a subset of OS, and could not be considered a general solution and DBT has shown important overhead.
+The GPH/MH architecture appears as the most interesting to expand the NV promised benefits. Through a solid and secure MH as L0, it is the only one able to reduce the platform TCB. This would bring several benefits towards a more secure infrastructure. First, a guarantee that the platform administrator could not lose control of the system thanks to an extra security layer. Second, certification perspectives: Klein et al.~\cite{Klein:2009} showed that less than 10 KLoC kernels could be formally verified, under several conditions, which is far from be achievable today with standard GPH/GPH approach where the TCB is an order of 
+magnitude bigger than MHs~\cite{nova}.
+
+However, the effort to set up a GPH/MH is strongly dependent on the technique for L2 virtualization. As already seen, to support L2 guests with hardware-assisted virtualization which is becoming mainstream, the MH needs to export nVMX (nested VMX) primitives. On the other end, adopting paravirtualization or dynamic binary translation for L2 does not requires particular hardware support, and thus would not require MH patching to set up a running platform. However, PV remains limited by supporting only a subset of system features which could be an issue as a general solution.
 %The last point of interest is related to device management. If MH act as L0 hypervisor, it has to deal with hardware devices, and this could necessitate of a significant code writing. In fact, there are several technologies, like Direct Assignment, allowing to bypass hypervisor control of a device. Those techniques are useful but they reduce the flexibility in the device management, requiring for example exclusive allocation of a device to a guest. To contrast this drawbacks, PCI-E propose the possibity to multiplex device with a set of virtual devices called virtual functions proposed to the L0 hypervisor, that will relax the contraint of exclusive allocation. Unfortunately this approach could not give the same flexibilty given by other techniques, like para-virtualization 
 %With MH over GPH, MH could directly assigne devices to GPH that is able to implement  para-virtualize device, for example. 
 %This will relief the MH of a part of devices management, giving to the GPH the responsibility to drive concretely the device but without losing interesting features. Therefore, we will need a limited amount of code to handle device without have to deal with each specific device.
 
-To sum up,  the adoption of MH could  increase feature set introduced by nested virtualization adoption. The first impeding problem is the implementation of MH, able to propose to guest to virtualize with hardware assistance. In next section, we present an implementation of GPH over MH, that try to circumvent this limitation leveraging paravirtualization.
+Therefore, a MH-based architecture could increase the feature set of current NV architectures, mostly vertically. The main remaining barrier is to come up with an MH implementation supporting HAV nested guests. We are currently working on a GPH/MH implementation based on Xen over NOVA aiming to lift this limitation using PV.
 
 \section{Security Architecture}
 \label{ref:arch}
 
 
-In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on Xen over NOVA \cite{nova}.
-
+In the previous sections we proposed a functional analysis of cloud architecture in order to respect design principles that we identified in the introduction. In this section, we propose a GPH over MH implementation, based on .
 
 \begin{itemize}[]
 \item \textbf{Inter-platform support} Executed as L1, Xen would virtualize its nested guest initially using PV delivering the compatibility layer.
